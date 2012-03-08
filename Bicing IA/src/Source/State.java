@@ -14,13 +14,12 @@ import java.util.ArrayList;
  */
 public class State {
        
-    public ArrayList<Integer> stations;
-    public Pair[] vans;
-    
-    public State() {
-        //int numStations = Bicing.getNumStations();
-        this.stations = new ArrayList<Integer>();
-        
+    public Integer[] stations;
+    public Integer[] vans;
+
+    State(Integer[] numStations, Integer[] vansPosition) {
+        this.stations = numStations;
+        this.vans = vansPosition;
     }
   
 }
