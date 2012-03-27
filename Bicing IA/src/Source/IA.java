@@ -25,7 +25,7 @@ public class IA {
     
     
     // Pre: assuming ther're enough bicycles to cover the expected amount of bycycles
-    public State GetInitialState() {
+    public BicingState GetInitialState() {
         Integer[] numBic = new Integer[this.context.getNumStations()];        
         //Integer[] sortedStations = new Integer[this.context.getNumStations()];
         Integer[] vansStation = new Integer[NUM_VANS]; 
@@ -38,7 +38,7 @@ public class IA {
             // Vans
         }
      
-        return new State(numBic, vansStation);       
+        return new BicingState(numBic, vansStation);       
     }
     
     /**
