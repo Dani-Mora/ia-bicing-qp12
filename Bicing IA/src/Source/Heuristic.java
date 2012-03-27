@@ -13,16 +13,14 @@ import aima.search.framework.HeuristicFunction;
 public class Heuristic implements HeuristicFunction {
     
     /* Constants */
-    private final const Integer HEURISTIC_SOL1 = 1;
-    private final const Integer HEURISTIC_SOL2 = 2;
+    private static final Integer HEURISTIC_SOL1 = 1;
+    private static final Integer HEURISTIC_SOL2 = 2;
     // ...
-    
-    public int getHeuristicValue(Object state)
-    {
-        BicingState st = (BicingState) state;
-        
-        // .. //
-        
+
+    @Override
+    public double getHeuristicValue(Object o) {
+        BicingState st = (BicingState) o;
+        return 0;
     }
     
 }
