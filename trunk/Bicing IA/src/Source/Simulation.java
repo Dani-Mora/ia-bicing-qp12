@@ -31,7 +31,7 @@ public class Simulation {
     private static void ExecuteHillClimbing(Bicing bicing, BicingState initSt) {
         System.out.println("\n HillClimbing Solution  -->");
         try {
-            Problem problem = new Problem(initSt, new Successors(), new FinalCondition(), new Heuristic());
+            Problem problem = new Problem(initSt, new Successors(bicing, NUM_VANS), new FinalCondition(), new Heuristic());
             Search search =  new HillClimbingSearch();
             SearchAgent agent = new SearchAgent(problem,search);
         } catch (Exception e) {

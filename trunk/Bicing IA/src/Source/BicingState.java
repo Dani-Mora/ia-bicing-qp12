@@ -4,9 +4,7 @@
  */
 package Source;
 
-import aima.util.Pair;
 import IA.Bicing.Bicing;
-import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -15,15 +13,15 @@ import java.util.Random;
  */
 public class BicingState {
        
-    public Integer[] stations;
-    public Integer[] vans;
+    public Integer[] numBic;   
+    public Integer[] vanPositions;
 
-    BicingState(Integer[] numStations, Integer[] vansPosition) {
-        this.stations = numStations;
-        this.vans = vansPosition;
+    BicingState(Integer[] numBic, Integer[] vansPosition) {
+        this.numBic = numBic;
+        this.vanPositions = vansPosition;
     }
   
-     // Pre: assuming ther're enough bicycles to cover the expected amount of bycycles
+    // Pre: assuming ther're enough bicycles to cover the expected amount of bycycles
     public static BicingState GetInitialState(Bicing context, Integer numVans) {
         Random rand = new Random();
         Integer[] numBic = new Integer[context.getNumStations()];        
