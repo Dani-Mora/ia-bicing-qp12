@@ -12,12 +12,12 @@ import java.util.ArrayList;
  *
  * @author Dani
  */
-public class State {
+public class BicingState {
        
     public Integer[] stations;
     public Integer[] vans;
 
-    State(Integer[] numStations, Integer[] vansPosition) {
+    BicingState(Integer[] numStations, Integer[] vansPosition) {
         this.stations = numStations;
         this.vans = vansPosition;
     }
