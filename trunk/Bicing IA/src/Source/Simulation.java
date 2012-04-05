@@ -9,6 +9,8 @@ import aima.search.framework.Search;
 import aima.search.framework.SearchAgent;
 import aima.search.informed.HillClimbingSearch;
 import aima.search.informed.SimulatedAnnealingSearch;
+import java.util.Iterator;
+import java.util.Properties;
 
 /**
  *
@@ -21,12 +23,22 @@ public class Simulation {
     private static final Integer NUM_EST = 20;
     private static final Integer DEMAND = 0;
     
+    /* Print functions */
+    
+    private void printState(BicingState state) {
+        Integer bicycles[] = state.getBicycleDisposition();
+        ArrayList<Transport> movements = state.
+    }
+    
     public static void main(String[] args){
         Bicing bicing = new Bicing(NUM_EST,NUM_BIC, DEMAND);
         BicingState initialState = new BicingState(NUM_EST);
         initialState.calculateInitialState(bicing, NUM_BIC);
-        ExecuteHillClimbing(bicing, initialState);
-        ExecuteSimulatedAnnealing(bicing, initialState);
+        
+        
+        
+        //ExecuteHillClimbing(bicing, initialState);
+        //ExecuteSimulatedAnnealing(bicing, initialState);
     }
     
     private static void ExecuteHillClimbing(Bicing bicing, BicingState initSt) {
@@ -51,4 +63,24 @@ public class Simulation {
         }
     }
 
+    // CODI JAUME
+    
+        
+    private static void printInstrumentation(Properties properties) {
+        Iterator keys = properties.keySet().iterator();
+        while (keys.hasNext()) {
+            String key = (String) keys.next();
+            String property = properties.getProperty(key);
+            System.out.println(key + " : " + property);
+        }
+        
+    }
+    
+    private static void printActions(List actions) {
+        for (int i = 0; i < actions.size(); i++) {
+            String action = (String) actions.get(i);
+            System.out.println(action);
+        }
+    }
+    
 }
