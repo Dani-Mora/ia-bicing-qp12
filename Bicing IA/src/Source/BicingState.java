@@ -5,6 +5,8 @@
 package Source;
 
 import IA.Bicing.Bicing;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -13,12 +15,14 @@ import java.util.Random;
  */
 public class BicingState {
        
-    private Integer[] bicOnStation;   
+    private Integer[] bicOnStation; 
+    private List<Transport> movements;
     
     private static final Integer initialState = 0;
 
     BicingState(Integer[] numBic) {
         this.bicOnStation = numBic;
+        this.movements = new ArrayList<Transport>();
     }
     
     BicingState(Integer numStations) {
@@ -121,10 +125,32 @@ public class BicingState {
     public Integer getNumBicycles(Integer station) {
         return this.bicOnStation[station];
     }
+
+    public List<Transport> getMovements() {
+        return movements;
+    }
+    
+    // OPERATORS //
     
     public void simpleMoveBicycles(Integer origen, Integer dest, Integer nBic) {
+        this.movements.add(new Transport(origen, dest, nBic));
         this.bicOnStation[origen] -= nBic;
         this.bicOnStation[dest] += nBic;
     }
+    
+    public void doubleMoveBicycles(Integer origen, Integer dest1, Integer dest2, Integer nBic, Integer secondDestBic) {
+        this.movements.add(new Transport(origen, dest1, dest2, nBic, secondDestBic));
+        this.bicOnStation[origen] -= nBic;
+        this.bicOnStation[dest1] += nBic - secondDestBic;
+        this.bicOnStation[dest2] += secondDestBic;
+    }
+    
+    /*
+    public void removeMovement(int index) {
+        this.movements.remove(index);
+    }
+     * */
+    
+    // ** TODO **/
 
 }

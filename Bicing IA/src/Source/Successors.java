@@ -49,7 +49,7 @@ public class Successors implements SuccessorFunction {
         for (int f = 0; f < this.numVans; ++f) {
             for (int i = 0; i < numStations; ++i) {
                 // afegir goal condition que ens diu que acabem si hem mogut totes les furgones i/o ja no queden moviments
-                if (TallarArbre si sobren bicis) {
+                //if (TallarArbre si sobren bicis) {
                     for (int j = 0; j < numStations; ++j) {
                             if (i != j) {
                                 for (int z = 0; z <= 30; ++z) {
@@ -59,7 +59,7 @@ public class Successors implements SuccessorFunction {
                                 }
                             }
                         }   
-               }
+              // }
             }
         }
         
