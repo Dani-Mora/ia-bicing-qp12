@@ -17,7 +17,7 @@ import aima.search.informed.SimulatedAnnealingSearch;
 public class Simulation {
         
     private static final Integer NUM_VANS = 6;
-    private static final Integer NUM_BICIS = 120;
+    private static final Integer NUM_BICIS = 1000;
     private static final Integer NUM_EST = 20;
     private static final Integer DEMANDA = 0;
     
