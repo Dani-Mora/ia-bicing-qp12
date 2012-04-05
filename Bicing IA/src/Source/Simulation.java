@@ -9,7 +9,9 @@ import aima.search.framework.Search;
 import aima.search.framework.SearchAgent;
 import aima.search.informed.HillClimbingSearch;
 import aima.search.informed.SimulatedAnnealingSearch;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -25,16 +27,24 @@ public class Simulation {
     
     /* Print functions */
     
-    private void printState(BicingState state) {
+    private static void printState(BicingState state) {
         Integer bicycles[] = state.getBicycleDisposition();
-        ArrayList<Transport> movements = state.
+        ArrayList<Transport> movements = (ArrayList<Transport>) state.getMovements();
+        
+        for (int i = 0; i < bicycles.length; ++i) {
+            System.out.println("Estació " + i + " : " + bicycles[i] + " bicycles");
+        }
+        
+        for (int i = 0; i < movements.size(); ++i) {
+            System.out.println("Movement " + i + " : " + movements.get(i).getOrigin() + " - " + movements.get(i).getBicyclesAmount() + "-> " + movements.get(i).getPreferredDestination() + "," + movements.get(i).getSecondDestination() + "(" + movements.get(i).getBicyclesToSecondDest() + ")");
+        }
     }
     
     public static void main(String[] args){
         Bicing bicing = new Bicing(NUM_EST,NUM_BIC, DEMAND);
         BicingState initialState = new BicingState(NUM_EST);
         initialState.calculateInitialState(bicing, NUM_BIC);
-        
+        printState(initialState);
         
         
         //ExecuteHillClimbing(bicing, initialState);
