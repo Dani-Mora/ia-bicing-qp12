@@ -5,6 +5,7 @@
 package Source;
 
 import IA.Bicing.Bicing;
+import aima.search.framework.Successor;
 import aima.search.framework.SuccessorFunction;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,27 +16,56 @@ import java.util.List;
  */
 public class Successors implements SuccessorFunction {
 
-    private Bicing context;
-    private Integer numVans;
+    private final static Integer OPERATORS = 0;
     
-    public Successors(Bicing bicing, Integer numVans)
+    private Bicing context;
+    
+    public Successors(Bicing bicing)
     {
         this.context = bicing;
-        this.numVans = numVans;
     }
     
     @Override
     public List getSuccessors(Object o) {
-        ArrayList successors = new ArrayList();
-        Integer numStations = this.context.getNumStations();
+        BicingState state = (BicingState) o;
         
-        for (int i = 0; i < numVans; ++i) {
-            for (int j = 0; j < numStations; ++j)   {
-                // TODO
-            }         
+        if (OPERATORS == 0) {
+            return this.getSuccessorsA(state);
+        }
+        else {
+            return null; //return this.getSuccessorsB(state);
+        }
+    }
+    
+    private List getSuccessorsA(BicingState state) {
+        ArrayList successors = new ArrayList();
+        Integer numStations = this.context.getNumStations();            
+        
+        // Simple movements
+        for (int i = 0; i < numStations; ++i) {
+                for (int j = 0; j < numStations; ++j) {
+                    if (i != j) {
+                        for (int z = 0; z <= 30; ++z) {
+                            BicingState newState = new BicingState(state.getBicycleDisposition());
+                            newState.simpleMoveBicycles(i, j, z);
+                            successors.add(new Successor(i + " - " + z + " - > " + j, newState));                
+                        }
+                    }
+                }       
+        }
+        
+        // Simple movements
+        for (int i = 0; i < numStations; ++i) {
+                for (int j = 0; j < numStations; ++j) {
+                    for (int k = 0; k < numStations; ++k)
+                    for (int z = 0; z <= 30; ++z) {
+                        BicingState newState = new BicingState(state.getBicycleDisposition());
+                        newState.simpleMoveBicycles(i, j, z);
+                        successors.add(new Successor(i + " - " + z + " - > " + j, newState));                
+                    }
+                }       
         }
         
         return successors;
-    }
-    
+    } 
 }

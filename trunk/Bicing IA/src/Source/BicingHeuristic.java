@@ -5,12 +5,13 @@
 package Source;
 
 import aima.search.framework.HeuristicFunction;
+import java.util.Random;
 
 /**
  *
  * @author Dani
  */
-public class Heuristic implements HeuristicFunction {
+public class BicingHeuristic implements HeuristicFunction {
 
     private final Integer heuristicUsed = 0;
     
@@ -26,7 +27,7 @@ public class Heuristic implements HeuristicFunction {
     }
     
     protected double getComplexHeuristic(BicingState st) {
-        return 0;
+        return new Random().nextDouble();
     }
     
     protected double getSimpleHeuristic(BicingState st) {

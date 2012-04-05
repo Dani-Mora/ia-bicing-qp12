@@ -13,45 +13,118 @@ import java.util.Random;
  */
 public class BicingState {
        
-    public Integer[] numBic;   
-    public Integer[] vanPositions;
+    private Integer[] bicOnStation;   
     
     private static final Integer initialState = 0;
 
-    BicingState(Integer[] numBic, Integer[] vansPosition) {
-        this.numBic = numBic;
-        this.vanPositions = vansPosition;
+    BicingState(Integer[] numBic) {
+        this.bicOnStation = numBic;
     }
-  
-    // Pre: assuming ther're enough bicycles to cover the expected amount of bycycles
-    public static BicingState GetInitialState(Bicing context, Integer numVans) {
-        if (initialState == 0) {
-            Random rand = new Random();
-            Integer[] numBic = new Integer[context.getNumStations()];        
-            //Integer[] sortedStations = new Integer[this.context.getNumStations()];
-            Integer[] vansStation = new Integer[numVans]; 
+    
+    BicingState(Integer numStations) {
+        this.bicOnStation = new Integer[numStations];
+    }
 
-            int numStations = context.getNumStations();
-            for (int i = 0; i < numStations; ++i) {
-                // Stations
-                numBic[i] = context.getStationNextState((i));
-                vansStation[i] = rand.nextInt(numStations);
-                // Vans
-            }
-            return new BicingState(numBic, vansStation);
+    public void calculateInitialState(Bicing context, Integer numBic) {
+        if (initialState == 0) {
+            this.calculateComplexInitialState(context, numBic);            
         }
         else
         {
-            return null;   
+            this.calculateSimpleInitialState(context, numBic);     
         }
     }
     
+    private Integer calculateDemandAverage(Bicing context) {
+        Integer average = 0;
+        for (int i = 0; i < this.bicOnStation.length; ++i) {
+            average += context.getDemandNextHour(i);
+        }
+        average /= this.bicOnStation.length;
+        return average;
+    }
+    
+    private Integer calculateTotalAverage(Integer numBic) {
+        Integer result = numBic/this.bicOnStation.length;
+        return result;
+    } 
+    
+    private void calculateComplexInitialState(Bicing context, Integer numBic) {
+        Integer demandBicycleAverage = this.calculateDemandAverage(context);
+        Integer totalBicycleAverage =  this.calculateTotalAverage(numBic);
+        Integer bicLeft = numBic;
+        Integer belowDemandCounter = 0;
+        
+        // We assign the total average, that could be below the demand
+        for (int i = 0; i < this.bicOnStation.length; ++i) {
+            Integer demand = context.getDemandNextHour(i);
+            Integer assignedBicycles = demand;
+            if (demand <= totalBicycleAverage) {
+                assignedBicycles = demand;
+            }
+            else {
+                assignedBicycles = totalBicycleAverage;
+                ++belowDemandCounter;
+            }
+            bicLeft -= assignedBicycles;
+            if (bicLeft < 0) {
+                System.out.println("ERROR: no bicycles left");
+            }
+            this.bicOnStation[i] = assignedBicycles;
+        }
+        
+        // bicLeft >= 0
+        int iter = 0;
+        while (bicLeft > 0) {
+            Integer assignedBicycles = 0;
+            Integer currentBicycles = this.bicOnStation[iter];
+            Integer neededBicycles = context.getDemandNextHour(iter) - currentBicycles;
+            if (neededBicycles < 0 && neededBicycles <= bicLeft) {
+                assignedBicycles = neededBicycles; 
+            }
+            else {
+                assignedBicycles = bicLeft;
+            }
+            bicLeft -= assignedBicycles;
+            this.bicOnStation[iter] += assignedBicycles;
+            iter = (iter++) % numBic;
+        }   
+    }
+    
+    private void calculateSimpleInitialState(Bicing context, Integer numBic) {
+        Random rand = new Random();
+     
+        Integer bicLeft = numBic;
+        Integer demandBicycleAverage = this.calculateDemandAverage(context);
+        Integer currentStation = 0;
+        
+        while (bicLeft > 0) {         
+            Integer currentDemand = context.getDemandNextHour(currentStation);
+            Integer currentBicycles = this.bicOnStation[currentStation];
+            Integer addedBicycles = rand.nextInt(currentDemand - currentBicycles);
+            if (bicLeft < addedBicycles) {
+                addedBicycles = bicLeft;
+            }
+            bicLeft -= addedBicycles;
+            this.bicOnStation[currentStation] += addedBicycles;
+            currentStation = (currentStation++ % this.bicOnStation.length);
+            if (bicLeft < 0) {
+                System.out.println("ERROR: no bicycles left");
+            }
+        }
+    }
+    
+    public Integer[] getBicycleDisposition() {
+        return this.bicOnStation;
+    }
+    
     public Integer getNumBicycles(Integer station) {
-        return this.numBic[station];
+        return this.bicOnStation[station];
     }
     
-    public Integer getVanPosition(Integer vanId) {
-        return this.vanPositions[vanId];
+    public void simpleMoveBicycles(Integer origen, Integer dest, Integer nBic) {
+        this.bicOnStation[origen] -= nBic;
+        this.bicOnStation[dest] += nBic;
     }
-    
+
 }

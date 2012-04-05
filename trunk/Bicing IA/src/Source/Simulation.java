@@ -17,13 +17,14 @@ import aima.search.informed.SimulatedAnnealingSearch;
 public class Simulation {
         
     private static final Integer NUM_VANS = 6;
-    private static final Integer NUM_BICIS = 1000;
+    private static final Integer NUM_BIC = 1000;
     private static final Integer NUM_EST = 20;
-    private static final Integer DEMANDA = 0;
+    private static final Integer DEMAND = 0;
     
     public static void main(String[] args){
-        Bicing bicing = new Bicing(NUM_EST,NUM_BICIS, DEMANDA);
-        BicingState initialState = BicingState.GetInitialState(bicing, NUM_VANS);
+        Bicing bicing = new Bicing(NUM_EST,NUM_BIC, DEMAND);
+        BicingState initialState = new BicingState(NUM_EST);
+        initialState.calculateInitialState(bicing, NUM_BIC);
         ExecuteHillClimbing(bicing, initialState);
         ExecuteSimulatedAnnealing(bicing, initialState);
     }
@@ -31,7 +32,7 @@ public class Simulation {
     private static void ExecuteHillClimbing(Bicing bicing, BicingState initSt) {
         System.out.println("\n HillClimbing Solution  -->");
         try {
-            Problem problem = new Problem(initSt, new Successors(bicing, NUM_VANS), new FinalCondition(), new Heuristic());
+            Problem problem = new Problem(initSt, new Successors(bicing), new FinalCondition(), new BicingHeuristic());
             Search search =  new HillClimbingSearch();
             SearchAgent agent = new SearchAgent(problem,search);
         } catch (Exception e) {
@@ -42,7 +43,7 @@ public class Simulation {
     private static void ExecuteSimulatedAnnealing(Bicing bicing, BicingState initSt) {
         System.out.println("\nSimulated Annealing Solution -->");
         try {
-            Problem problem = new Problem(initSt, new SuccessorsSA(), new FinalCondition(), new Heuristic());
+            Problem problem = new Problem(initSt, new SuccessorsSA(), new FinalCondition(), new BicingHeuristic());
             Search search =  new SimulatedAnnealingSearch();
             SearchAgent agent = new SearchAgent(problem,search);
         } catch (Exception e) {
