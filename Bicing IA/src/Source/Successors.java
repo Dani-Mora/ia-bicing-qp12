@@ -19,10 +19,12 @@ public class Successors implements SuccessorFunction {
     private final static Integer OPERATORS = 0;
     
     private Bicing context;
+    private Integer numVans;
     
-    public Successors(Bicing bicing)
+    public Successors(Bicing bicing, Integer numV)
     {
         this.context = bicing;
+        this.numVans = numV;
     }
     
     @Override
@@ -41,17 +43,24 @@ public class Successors implements SuccessorFunction {
         ArrayList successors = new ArrayList();
         Integer numStations = this.context.getNumStations();            
         
+        
+        
         // Simple movements
-        for (int i = 0; i < numStations; ++i) {
-                for (int j = 0; j < numStations; ++j) {
-                    if (i != j) {
-                        for (int z = 0; z <= 30; ++z) {
-                            BicingState newState = new BicingState(state.getBicycleDisposition());
-                            newState.simpleMoveBicycles(i, j, z);
-                            successors.add(new Successor(i + " - " + z + " - > " + j, newState));                
-                        }
-                    }
-                }       
+        for (int f = 0; f < this.numVans; ++f) {
+            for (int i = 0; i < numStations; ++i) {
+                // afegir goal condition que ens diu que acabem si hem mogut totes les furgones i/o ja no queden moviments
+                if (TallarArbre si sobren bicis) {
+                    for (int j = 0; j < numStations; ++j) {
+                            if (i != j) {
+                                for (int z = 0; z <= 30; ++z) {
+                                    BicingState newState = new BicingState(state.getBicycleDisposition());
+                                    newState.simpleMoveBicycles(i, j, z);
+                                    successors.add(new Successor(i + " - " + z + " - > " + j, newState));                
+                                }
+                            }
+                        }   
+               }
+            }
         }
         
         // Simple movements
