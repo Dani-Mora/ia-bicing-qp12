@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.Random;
 
 /**
  *
@@ -21,30 +22,47 @@ import java.util.Properties;
 public class Simulation {
         
     private static final Integer NUM_VANS = 6;
-    private static final Integer NUM_BIC = 1000;
-    private static final Integer NUM_EST = 20;
+    private static final Integer NUM_BIC = 1250;
+    private static final Integer NUM_EST = 25;
     private static final Integer DEMAND = 0;
     
     /* Print functions */
     
-    private static void printState(BicingState state) {
+    private static void printInfo(Bicing context, Integer i) {
+        System.out.println("No usades: " + context.getStationDoNotMove(i));
+        System.out.println("Hi haura: " + context.getStationNextState(i));
+        System.out.println("Demanda: " + context.getDemandNextHour(i));
+    }
+    
+    private static void printState(BicingState state, Bicing context) {
         Integer bicycles[] = state.getBicycleDisposition();
         ArrayList<Transport> movements = (ArrayList<Transport>) state.getMovements();
-        
+        Integer totalDemand = 0, totalAssignedBicycles = 0;
         for (int i = 0; i < bicycles.length; ++i) {
             System.out.println("Estació " + i + " : " + bicycles[i] + " bicycles");
+            totalDemand += context.getDemandNextHour(i);
+            totalAssignedBicycles += bicycles[i];
+            printInfo(context, i);
         }
-        
+        System.out.println("Total Demand: " + totalDemand);
+        System.out.println("Total Assigned Bicycles: " + totalAssignedBicycles);
+        System.out.println("Theoretical Bicycles = " + NUM_BIC);
         for (int i = 0; i < movements.size(); ++i) {
             System.out.println("Movement " + i + " : " + movements.get(i).getOrigin() + " - " + movements.get(i).getBicyclesAmount() + "-> " + movements.get(i).getPreferredDestination() + "," + movements.get(i).getSecondDestination() + "(" + movements.get(i).getBicyclesToSecondDest() + ")");
         }
     }
     
     public static void main(String[] args){
-        Bicing bicing = new Bicing(NUM_EST,NUM_BIC, DEMAND);
+        Random rand = new Random();
+        Bicing bicing = new Bicing(NUM_EST,NUM_BIC, DEMAND, rand.nextInt());
         BicingState initialState = new BicingState(NUM_EST);
+        System.out.println("****************SIMPLE******************");
         initialState.calculateInitialState(bicing, NUM_BIC);
-        printState(initialState);
+        printState(initialState, bicing);
+        System.out.println("****************COMPLEX******************");
+        initialState.setInitialState(0);
+        initialState.calculateInitialState(bicing, NUM_BIC);
+        printState(initialState, bicing);
         
         
         //ExecuteHillClimbing(bicing, initialState);
@@ -54,7 +72,7 @@ public class Simulation {
     private static void ExecuteHillClimbing(Bicing bicing, BicingState initSt) {
         System.out.println("\n HillClimbing Solution  -->");
         try {
-            Problem problem = new Problem(initSt, new Successors(bicing, NUM_VANS), new FinalCondition(), new BicingHeuristic());
+            Problem problem = new Problem(initSt, new Successors(bicing, NUM_VANS), new FinalCondition(), new BicingHeuristic(bicing));
             Search search =  new HillClimbingSearch();
             SearchAgent agent = new SearchAgent(problem,search);
         } catch (Exception e) {
@@ -65,7 +83,7 @@ public class Simulation {
     private static void ExecuteSimulatedAnnealing(Bicing bicing, BicingState initSt) {
         System.out.println("\nSimulated Annealing Solution -->");
         try {
-            Problem problem = new Problem(initSt, new SuccessorsSA(), new FinalCondition(), new BicingHeuristic());
+            Problem problem = new Problem(initSt, new SuccessorsSA(), new FinalCondition(), new BicingHeuristic(bicing));
             Search search =  new SimulatedAnnealingSearch();
             SearchAgent agent = new SearchAgent(problem,search);
         } catch (Exception e) {

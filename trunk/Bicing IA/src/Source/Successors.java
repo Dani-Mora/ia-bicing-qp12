@@ -41,26 +41,21 @@ public class Successors implements SuccessorFunction {
     
     private List getSuccessorsA(BicingState state) {
         ArrayList successors = new ArrayList();
-        Integer numStations = this.context.getNumStations();            
-        
-        
+        Integer numStations = this.context.getNumStations();                   
         
         // Simple movements
-        for (int f = 0; f < this.numVans; ++f) {
-            for (int i = 0; i < numStations; ++i) {
-                // afegir goal condition que ens diu que acabem si hem mogut totes les furgones i/o ja no queden moviments
-                //if (TallarArbre si sobren bicis) {
-                    for (int j = 0; j < numStations; ++j) {
-                            if (i != j) {
-                                for (int z = 0; z <= 30; ++z) {
-                                    BicingState newState = new BicingState(state.getBicycleDisposition());
-                                    newState.simpleMoveBicycles(i, j, z);
-                                    successors.add(new Successor(i + " - " + z + " - > " + j, newState));                
-                                }
+        for (int i = 0; i < numStations; ++i) {
+            // afegir goal condition que ens diu que acabem si hem mogut totes les furgones i/o ja no queden moviments
+            //if (TallarArbre si sobren bicis) {
+                for (int j = 0; j < numStations; ++j) {
+                        if (i != j) {
+                            for (int z = 0; z <= 30; ++z) {
+                                BicingState newState = new BicingState(state.getBicycleDisposition(), state.getMovements());
+                                newState.simpleMoveBicycles(i, j, z);
+                                successors.add(new Successor(i + " - " + z + " - > " + j, newState));                
                             }
-                        }   
-              // }
-            }
+                        }
+                    }   
         }
         
         // Simple movements
@@ -68,7 +63,7 @@ public class Successors implements SuccessorFunction {
                 for (int j = 0; j < numStations; ++j) {
                     for (int k = 0; k < numStations; ++k)
                     for (int z = 0; z <= 30; ++z) {
-                        BicingState newState = new BicingState(state.getBicycleDisposition());
+                        BicingState newState = new BicingState(state.getBicycleDisposition(), state.getMovements());
                         newState.simpleMoveBicycles(i, j, z);
                         successors.add(new Successor(i + " - " + z + " - > " + j, newState));                
                     }

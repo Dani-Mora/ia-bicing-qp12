@@ -12,7 +12,7 @@ public class Transport {
     
     private Integer origin;
     private Integer preferredDestination;
-    private Integer secondDestination;
+    private Integer secondDestination = -1;
     private Integer bicyclesAmount;
     private Integer bicyclesToSecondDest;
     
@@ -46,6 +46,10 @@ public class Transport {
 
     public Integer getSecondDestination() {
         return secondDestination;
+    }
+    
+    public Boolean HasTwoDestinations() {
+        return this.secondDestination != -1;
     }
     
 }
