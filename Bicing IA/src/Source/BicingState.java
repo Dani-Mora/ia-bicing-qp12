@@ -18,16 +18,25 @@ public class BicingState {
     private Integer[] bicOnStation; 
     private List<Transport> movements;
     
-    private static final Integer initialState = 0;
+    private Integer initialState = 1;
 
-    BicingState(Integer[] numBic) {
-        this.bicOnStation = numBic;
+    public void setInitialState(Integer initialState) {
+        this.initialState = initialState;
+    }
+
+    BicingState(Integer numStations) {
         this.movements = new ArrayList<Transport>();
+        this.bicOnStation = new Integer[numStations];
+        for (int i = 0; i < this.bicOnStation.length; ++i) {
+            this.bicOnStation[i] = 0;
+        }    
     }
     
-    BicingState(Integer numStations) {
-        this.bicOnStation = new Integer[numStations];
+    BicingState(Integer[] bicOnStations, List<Transport> movements) {
+        this.bicOnStation = bicOnStations;
+        this.movements = movements;
     }
+   
 
     public void calculateInitialState(Bicing context, Integer numBic) {
         if (initialState == 0) {
@@ -101,17 +110,36 @@ public class BicingState {
         Integer bicLeft = numBic;
         Integer demandBicycleAverage = this.calculateDemandAverage(context);
         Integer currentStation = 0;
-        
-        while (bicLeft > 0) {         
-            Integer currentDemand = context.getDemandNextHour(currentStation);
-            Integer currentBicycles = this.bicOnStation[currentStation];
-            Integer addedBicycles = rand.nextInt(currentDemand - currentBicycles);
+        int iterWh = 0;
+        while (bicLeft > 0) {
+
+            System.out.println("Bic: " + bicLeft);
+            Integer currentDemand = context.getDemandNextHour(currentStation);System.out.println("currentDemand: " + currentDemand);
+            Integer currentBicycles = this.bicOnStation[currentStation];System.out.println("currentBicycles: " + currentBicycles);
+            Integer aux = currentDemand - currentBicycles;
+            Integer addedBicycles;
+            if (aux <= 0) {
+                addedBicycles = 0;System.out.println("IF");
+                ++iterWh;
+                if (iterWh == this.bicOnStation.length) {
+                    addedBicycles = bicLeft;
+                }
+            }
+            else {
+                iterWh = 0;
+                Integer rnd = rand.nextInt(aux+1); System.out.println("ELSE");
+                addedBicycles = rnd; System.out.println(rnd);
+            } //random value between current bicycles and current demand
+            // no bicycles added if current bicycles > current demand
+            System.out.println("addedBicycles: " + addedBicycles);
+            
             if (bicLeft < addedBicycles) {
                 addedBicycles = bicLeft;
             }
             bicLeft -= addedBicycles;
             this.bicOnStation[currentStation] += addedBicycles;
-            currentStation = (currentStation++ % this.bicOnStation.length);
+            currentStation++;
+            currentStation %= this.bicOnStation.length;
             if (bicLeft < 0) {
                 System.out.println("ERROR: no bicycles left");
             }
@@ -129,6 +157,16 @@ public class BicingState {
     public List<Transport> getMovements() {
         return movements;
     }
+
+    public void setBicOnStation(Integer[] bicOnStation) {
+        this.bicOnStation = bicOnStation;
+    }
+
+    public void setMovements(List<Transport> movements) {
+        this.movements = movements;
+    }
+    
+    
     
     // OPERATORS //
     
