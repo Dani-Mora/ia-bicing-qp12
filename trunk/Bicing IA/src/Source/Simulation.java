@@ -21,7 +21,7 @@ import java.util.Random;
  */
 public class Simulation {
         
-    private static final Integer NUM_VANS = 6;
+    private static final Integer NUM_VANS = 5;
     private static final Integer NUM_BIC = 1250;
     private static final Integer NUM_EST = 25;
     private static final Integer DEMAND = 0;
@@ -35,21 +35,39 @@ public class Simulation {
     }
     
     private static void printState(BicingState state, Bicing context) {
-        Integer bicycles[] = state.getBicycleDisposition();
+        //mph
+//        Integer bicycles[] = state.getBicycleDisposition();
+//        ArrayList<Transport> movements = (ArrayList<Transport>) state.getMovements();
+//        Integer totalDemand = 0, totalAssignedBicycles = 0;
+//        for (int i = 0; i < bicycles.length; ++i) {
+//            System.out.println("Estació " + i + " : " + bicycles[i] + " bicycles");
+//            totalDemand += context.getDemandNextHour(i);
+//            totalAssignedBicycles += bicycles[i];
+//            printInfo(context, i);
+//        }
+//        System.out.println("Total Demand: " + totalDemand);
+//        System.out.println("Total Assigned Bicycles: " + totalAssignedBicycles);
+//        System.out.println("Theoretical Bicycles = " + NUM_BIC);
+//        for (int i = 0; i < movements.size(); ++i) {
+//            System.out.println("Movement " + i + " : " + movements.get(i).getOrigin() + " - " + movements.get(i).getBicyclesAmount() + "-> " + movements.get(i).getPreferredDestination() + "," + movements.get(i).getSecondDestination() + "(" + movements.get(i).getBicyclesToSecondDest() + ")");
+//        }
         ArrayList<Transport> movements = (ArrayList<Transport>) state.getMovements();
-        Integer totalDemand = 0, totalAssignedBicycles = 0;
-        for (int i = 0; i < bicycles.length; ++i) {
-            System.out.println("Estació " + i + " : " + bicycles[i] + " bicycles");
-            totalDemand += context.getDemandNextHour(i);
-            totalAssignedBicycles += bicycles[i];
-            printInfo(context, i);
-        }
-        System.out.println("Total Demand: " + totalDemand);
-        System.out.println("Total Assigned Bicycles: " + totalAssignedBicycles);
-        System.out.println("Theoretical Bicycles = " + NUM_BIC);
+        System.out.println("*****printState*****");
+        System.out.println("Number of selected movements:" + movements.size());
+        System.out.println("MOVEMENT DESCRIPTION LIST");
         for (int i = 0; i < movements.size(); ++i) {
-            System.out.println("Movement " + i + " : " + movements.get(i).getOrigin() + " - " + movements.get(i).getBicyclesAmount() + "-> " + movements.get(i).getPreferredDestination() + "," + movements.get(i).getSecondDestination() + "(" + movements.get(i).getBicyclesToSecondDest() + ")");
+            System.out.println(i+1);
+            Transport t = movements.get(i);
+            System.out.println(" ORIGIN ST: " + t.getOrigin());
+            System.out.println(" DESTINATION ST #1: " + t.getPreferredDestination());
+            System.out.println(" BICYCLE AMOUNT TO #1: " + t.getBicyclesAmount());
+            if (t.HasTwoDestinations()) {
+                System.out.println(" DESTINATION ST #2: " + t.getSecondDestination());
+                System.out.println(" BICYCLE AMOUNT TO #2: " + t.getBicyclesToSecondDest());
+            }
         }
+        
+        
     }
     
     public static void main(String[] args){
@@ -57,15 +75,17 @@ public class Simulation {
         Bicing bicing = new Bicing(NUM_EST,NUM_BIC, DEMAND, rand.nextInt());
         BicingState initialState = new BicingState(NUM_EST);
         System.out.println("****************SIMPLE******************");
-        initialState.calculateInitialState(bicing, NUM_BIC);
+        //initialState.calculateInitialState(bicing, NUM_BIC);
+        initialState.calculateInitialState(bicing, NUM_BIC, NUM_VANS);
         printState(initialState, bicing);
-        System.out.println("****************COMPLEX******************");
-        initialState.setInitialState(0);
-        initialState.calculateInitialState(bicing, NUM_BIC);
-        printState(initialState, bicing);
+        //System.out.println("****************COMPLEX******************");
+        //initialState.setInitialState(0);
+        //initialState.calculateInitialState(bicing, NUM_BIC);
+        //printState(initialState, bicing);
         
         
-        //ExecuteHillClimbing(bicing, initialState);
+        ExecuteHillClimbing(bicing, initialState);
+        printState(initialState, bicing);
         //ExecuteSimulatedAnnealing(bicing, initialState);
     }
     
@@ -75,6 +95,10 @@ public class Simulation {
             Problem problem = new Problem(initSt, new Successors(bicing, NUM_VANS), new FinalCondition(), new BicingHeuristic(bicing));
             Search search =  new HillClimbingSearch();
             SearchAgent agent = new SearchAgent(problem,search);
+            
+            System.out.println();
+            printActions(agent.getActions());
+            printInstrumentation(agent.getInstrumentation());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -105,6 +129,7 @@ public class Simulation {
     }
     
     private static void printActions(List actions) {
+        System.out.println(actions.size());
         for (int i = 0; i < actions.size(); i++) {
             String action = (String) actions.get(i);
             System.out.println(action);
