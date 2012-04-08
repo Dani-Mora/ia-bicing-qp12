@@ -20,11 +20,12 @@ import java.util.Random;
  * @author Dani
  */
 public class Simulation {
-        
-    private static final Integer NUM_VANS = 5;
-    private static final Integer NUM_BIC = 1250;
+    
+    public static final Integer NUM_VANS = 5;
+    public static final Integer NUM_BIC = 1250;
     private static final Integer NUM_EST = 25;
-    private static final Integer DEMAND = 0;
+    public static final Integer DEMAND = 0;
+    public static Bicing bicing = new Bicing(NUM_EST,NUM_BIC, DEMAND, new Random().nextInt());
     
     /* Print functions */
     
@@ -76,23 +77,22 @@ public class Simulation {
         BicingState initialState = new BicingState(NUM_EST);
         System.out.println("****************SIMPLE******************");
         //initialState.calculateInitialState(bicing, NUM_BIC);
-        initialState.calculateInitialState(bicing, NUM_BIC, NUM_VANS);
+        initialState.calculateInitialState();
         printState(initialState, bicing);
         //System.out.println("****************COMPLEX******************");
         //initialState.setInitialState(0);
         //initialState.calculateInitialState(bicing, NUM_BIC);
         //printState(initialState, bicing);
-        
-        
-        ExecuteHillClimbing(bicing, initialState);
+           
+        ExecuteHillClimbing(initialState);
         printState(initialState, bicing);
         //ExecuteSimulatedAnnealing(bicing, initialState);
     }
     
-    private static void ExecuteHillClimbing(Bicing bicing, BicingState initSt) {
+    private static void ExecuteHillClimbing(BicingState initSt) {
         System.out.println("\n HillClimbing Solution  -->");
         try {
-            Problem problem = new Problem(initSt, new Successors(bicing, NUM_VANS), new FinalCondition(), new BicingHeuristic(bicing));
+            Problem problem = new Problem(initSt, new Successors(), new FinalCondition(), new BicingHeuristic());
             Search search =  new HillClimbingSearch();
             SearchAgent agent = new SearchAgent(problem,search);
             
@@ -104,10 +104,10 @@ public class Simulation {
         }
     }
     
-    private static void ExecuteSimulatedAnnealing(Bicing bicing, BicingState initSt) {
+    private static void ExecuteSimulatedAnnealing(BicingState initSt) {
         System.out.println("\nSimulated Annealing Solution -->");
         try {
-            Problem problem = new Problem(initSt, new SuccessorsSA(), new FinalCondition(), new BicingHeuristic(bicing));
+            Problem problem = new Problem(initSt, new SuccessorsSA(), new FinalCondition(), new BicingHeuristic());
             Search search =  new SimulatedAnnealingSearch();
             SearchAgent agent = new SearchAgent(problem,search);
         } catch (Exception e) {

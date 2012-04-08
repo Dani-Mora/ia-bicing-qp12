@@ -4,7 +4,6 @@
  */
 package Source;
 
-import IA.Bicing.Bicing;
 import aima.search.framework.Successor;
 import aima.search.framework.SuccessorFunction;
 import java.util.ArrayList;
@@ -17,15 +16,6 @@ import java.util.List;
 public class Successors implements SuccessorFunction {
 
     private final static Integer OPERATORS = 0;
-    
-    private Bicing context;
-    private Integer numVans;
-    
-    public Successors(Bicing bicing, Integer numV)
-    {
-        this.context = bicing;
-        this.numVans = numV;
-    }
     
     @Override
     public List getSuccessors(Object o) {
@@ -45,9 +35,9 @@ public class Successors implements SuccessorFunction {
     
     private int calculateBicycleSurplus(int indexStation) {
         int dNM, nS, dem;
-        dNM = context.getStationDoNotMove(indexStation);
-        nS = context.getStationNextState(indexStation);
-        dem = context.getDemandNextHour(indexStation);
+        dNM = Simulation.bicing.getStationDoNotMove(indexStation);
+        nS = Simulation.bicing.getStationNextState(indexStation);
+        dem = Simulation.bicing.getDemandNextHour(indexStation);
         return calculateBicycleSurplus(dNM, nS, dem);
     }
     
@@ -72,8 +62,8 @@ public class Successors implements SuccessorFunction {
     
     private List getSuccessorsA(BicingState state) {
         ArrayList successors = new ArrayList();
-        Integer numStations = this.context.getNumStations(); 
-        BicingHeuristic bicingHF = new BicingHeuristic(context);
+        Integer numStations = Simulation.bicing.getNumStations(); 
+        BicingHeuristic bicingHF = new BicingHeuristic();
         // Simple movements
         System.out.println("Generació de successors");
         //Primer generem tots els intercanvis d'origen
@@ -139,9 +129,7 @@ public class Successors implements SuccessorFunction {
                     successors.add(new Successor("Edit destination, transport" + i + " goes now to->" + movementDest, newState));
                 }
             }
-        }
-        
-        
+        }             
         return successors;
 //        for (int i = 0; i < numStations; ++i) {
 //            // afegir goal condition que ens diu que acabem si hem mogut totes les furgones i/o ja no queden moviments
