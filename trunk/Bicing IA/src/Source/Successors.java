@@ -21,19 +21,22 @@ public class Successors implements SuccessorFunction {
     public List getSuccessors(Object o) {
         BicingState state = (BicingState) o;
         ArrayList successors = new ArrayList();   
-        if (state.getMovements().size() < Simulation.NUM_VANS) {
-         List hola = this.getAllTransports(state, false);
-         System.out.println("Tamany de agregar transports: " + hola.size());
-         successors.addAll(hola);
-        }
-        List hola1 = this.EraseTransports(state);
-        List hola2 = this.UnifyTransports(state);
+//        if (state.getMovements().size() < Simulation.NUM_VANS) {
+//         List hola = this.getAllTransports(state, false);
+//         System.out.println("Tamany de agregar transports: " + hola.size());
+//         successors.addAll(hola);
+//        }
+        //List hola1 = this.EraseTransports(state);
+        //List hola2 = this.UnifyTransports(state);
+        List hola3 = this.getTransportChanges(state);
         
-        System.out.println("Tamany d'eliminar transports: " + hola1.size());
-        System.out.println("Tamany d'unificar transports: " + hola2.size());
+        //System.out.println("Tamany d'eliminar transports: " + hola1.size());
+        //System.out.println("Tamany d'unificar transports: " + hola2.size());
+        System.out.println("Tamany de canviar DESTINACIONS: " + hola3.size());
         
-        successors.addAll(hola1);
-        successors.addAll(hola2);
+        //successors.addAll(hola1);
+        //successors.addAll(hola2);
+        successors.addAll(hola3);
         System.out.println("Generació de successors"); 
         return successors;
        
@@ -96,7 +99,53 @@ public class Successors implements SuccessorFunction {
         }
         return successors;
     }
+   
+    private List getTransportChanges(BicingState state) {
+        
+        ArrayList successors = new ArrayList();     
+        Integer numStations = Simulation.bicing.getNumStations(); 
+        BicingHeuristic bicingHF = new BicingHeuristic();       
+        ArrayList<Integer> stationsInNeed = new ArrayList<Integer>();
+        for (int i = 0; i < numStations; ++i) {
+            int balance = calculateBicycleSurplus(i);
+            if (balance < 0) stationsInNeed.add(i);
+        }
+        for (int i = 0; i < state.getMovements().size(); ++i) {
+            int indexDest = state.getMovements().get(i).getPreferredDestination();
+            boolean found = false;
+            for (int j = 0; j < stationsInNeed.size() && !found; ++j) {
+                if (stationsInNeed.get(j).equals(indexDest)) {
+                    stationsInNeed.remove(j);
+                    found = true;
+                }
+            }
+        }
+        for (int i = 0; i < state.getMovements().size(); ++i) {
+            for (int j = 0; j < stationsInNeed.size(); ++j) {
+                //int movementDest = state.getMovements().get(i).getPreferredDestination();
+                //esta linea no tiene sentido. La estacion de destino es la stationsInNeed[j]
+                int movementDest = stationsInNeed.get(j);
+                int movementOrigin = state.getMovements().get(i).getOrigin();
+                //if (DestinationOK(movementDest, stationsInNeed)) {
+                BicingState newState = new BicingState(state.getMovements().size(), state.getMovements(), state.getAvailableBicyclesNextHour());
+                int newAmount = calculateBicycleAmount(movementOrigin, movementDest);
+                newAmount = Math.min(newAmount, 30);
+                newState.editDestination(i, movementDest, newAmount);
+                //newState.editDestination(i, movementDest); //aqui cambiaremos el valor de estimatedBicyclesNextHour del viejo y del nuevo destino
+                //newState.editBicycleAmount(i, newAmount);
+                    //System.out.println("b");
+
+                double d = bicingHF.getSimpleHeuristic(newState);
+                System.out.println("Successors newState heuristic = " + d);
+
+                successors.add(new Successor("Edit destination, transport" + i + " goes now to->" + movementDest, newState));
+                //}
+            }
+        }   
+        return successors;
+    }
     
+    /*
     private List getTransportChanges(BicingState state) {
         
         ArrayList successors = new ArrayList();     
@@ -137,7 +186,7 @@ public class Successors implements SuccessorFunction {
             }
         }   
         return successors;
-    }
+    }*/
     
     // dock -> indicates wether we want to avoid generating innecessary successors
     // possible millora, afegir nomes les bicis de diferencia

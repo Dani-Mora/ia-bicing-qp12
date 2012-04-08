@@ -257,6 +257,23 @@ public class BicingState {
         this.movements.set(indexMovement, t);
     }
     
+    public void editDestination(Integer indexMovement, Integer newDestination, Integer newAmount) {
+        Transport t = this.movements.get(indexMovement);
+        Integer oldAmount = t.getBicyclesAmount(), oldDest = t.getPreferredDestination();
+        Integer origin = t.getOrigin();
+        
+        this.estimatedBicyclesNextHour[oldDest] -= oldAmount;
+        this.estimatedBicyclesNextHour[origin] += oldAmount;
+        
+        this.estimatedBicyclesNextHour[newDestination] += newAmount;
+        this.estimatedBicyclesNextHour[origin] -= newAmount;
+        
+        t.setBicyclesAmount(newAmount);
+        t.setPreferredDestination(newDestination);
+        
+        this.movements.set(indexMovement, t);
+    }
+    
     // ** TODO **/
 
 }
