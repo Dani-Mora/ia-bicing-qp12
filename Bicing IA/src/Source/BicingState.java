@@ -15,6 +15,7 @@ import java.util.List;
 public class BicingState {
        
     private List<Transport> movements;
+    private Integer[] availableBicyclesNextHour;
     
     private Integer initialState = 1;
 
@@ -24,15 +25,22 @@ public class BicingState {
 
     BicingState() {
         this.movements = new ArrayList<Transport>();
+        this.availableBicyclesNextHour = new Integer[Simulation.bicing.getNumStations()];
     }
     
-    BicingState(Integer nm, List<Transport> mov) {
+    BicingState(Integer nm, List<Transport> mov, Integer[] availableB) {
         this.movements = new ArrayList<Transport>(nm);
         for (int i = 0; i < mov.size(); ++i) {
             this.movements.add(mov.get(i));
         }
+        this.availableBicyclesNextHour = new Integer[availableB.length];
+        for (int i = 0; i < availableB.length; ++i) {
+            this.availableBicyclesNextHour[i] = availableB[i];
+        }
     } 
 
+    // INITIAL STATE //
+    
     public void calculateInitialState() {
         if (initialState == 0) {
             this.calculateComplexInitialState();            
@@ -43,15 +51,13 @@ public class BicingState {
         }
     }
     
-    
     private void calculateComplexInitialState() {
         //
     }
     
     private int calculateBicycleSurplus(int doNotMove, int nextHour, int demand) {
         return Math.min(nextHour - demand, doNotMove);
-    }
-    
+    }   
 
     private void calculateSimpleInitialState() {
         Integer[] bicBalanceOnStation = new Integer[Simulation.bicing.getNumStations()];
@@ -138,6 +144,8 @@ public class BicingState {
         System.out.println("SITUATION ANALYSIS FINISHED");
     }
 
+    // MOVEMENTS //
+    
     public List<Transport> getMovements() {
         return movements;
     }
@@ -150,41 +158,53 @@ public class BicingState {
         this.movements.add(transp);
     }
     
+    public Integer getReceivedBycicles(Integer station) {
+        Integer result = 0;
+        Iterator transpIter = this.getMovements().iterator();
+        while(transpIter.hasNext()) {
+            Transport transp = (Transport)transpIter.next();
+            if (transp.HasTwoDestinations()) {
+                if (transp.getPreferredDestination() == station) {
+                    result += transp.getBicyclesAmount() - transp.getBicyclesToSecondDest();
+                }
+                else if (transp.getSecondDestination() == station) {
+                    result += transp.getBicyclesToSecondDest();
+                }
+            }
+            else {
+                if (transp.getPreferredDestination() == station) {
+                    result += transp.getBicyclesAmount();
+                }
+            }
+        }   
+        return result;
+    }
+    
     public Boolean stationAlreadyOrigin(Integer station) {
-        Iterator iterator = this.movements.iterator();
-        while(iterator.hasNext()) {
-            Transport transp = (Transport) iterator.next();
-            if (transp.getOrigin().equals(station)) {
+        Iterator transpIter = this.getMovements().iterator();
+        while(transpIter.hasNext()) {
+            Transport transp = (Transport)transpIter.next();
+            if (transp.getOrigin() == station) {
                 return true;
             }
         }
         return false;
     }
     
-    public Integer getNextStatePlusMovements(Integer station) {
-        return Simulation.bicing.getStationNextState(station) + this.getReceivedBicycles(station);
+    // AVAILABLE BICYCLES //
+    
+    public Integer getBicyclesNextHour(Integer station) {
+        return this.availableBicyclesNextHour[station];
     }
     
-    // No sé si la usaremos porque ya tenemos el balanced, pero la he hecho por si acaso
-    public Integer getReceivedBicycles(Integer station) {
-        Integer result = 0;
-        Iterator iterator = this.movements.iterator();
-        while(iterator.hasNext()) {
-            Transport transp = (Transport) iterator.next();
-            if (transp.getPreferredDestination() == station) {          
-                if (transp.HasTwoDestinations()) {
-                    result += transp.getBicyclesAmount() - transp.getBicyclesToSecondDest();
-                }
-                else {
-                    result += transp.getBicyclesAmount();
-                }
-            }
-            else if (transp.getSecondDestination() == station) {
-                result += transp.getBicyclesToSecondDest();
-            }
-        }
-        return result;
+    public void setBicyclesNextHour(Integer station, Integer newAmount) {
+        this.availableBicyclesNextHour[station] = newAmount;
     }
+
+    public Integer[] getAvailableBicyclesNextHour() {
+        return availableBicyclesNextHour;
+    }
+    
     
     // OPERATORS //
     
@@ -212,10 +232,6 @@ public class BicingState {
         t = this.movements.get(indexMovement);
         t.setPreferredDestination(newDestination);
         this.movements.set(indexMovement, t);
-    }
-       
-    public void removeMovement(Integer index) {
-        this.movements.remove(index);
     }
     
     // ** TODO **/
