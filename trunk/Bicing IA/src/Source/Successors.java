@@ -20,10 +20,20 @@ public class Successors implements SuccessorFunction {
     @Override
     public List getSuccessors(Object o) {
         BicingState state = (BicingState) o;
-        ArrayList successors = new ArrayList();       
-        successors.addAll(this.getAllTransports(state, false));
-        successors.addAll(this.EraseTransports(state));
-        successors.addAll(this.UnifyTransports(state));
+        ArrayList successors = new ArrayList();   
+        if (state.getMovements().size() < Simulation.NUM_VANS) {
+         List hola = this.getAllTransports(state, false);
+         System.out.println("Tamany de agregar transports: " + hola.size());
+         successors.addAll(hola);
+        }
+        List hola1 = this.EraseTransports(state);
+        List hola2 = this.UnifyTransports(state);
+        
+        System.out.println("Tamany d'eliminar transports: " + hola1.size());
+        System.out.println("Tamany d'unificar transports: " + hola2.size());
+        
+        successors.addAll(hola1);
+        successors.addAll(hola2);
         System.out.println("Generació de successors"); 
         return successors;
        
@@ -140,12 +150,12 @@ public class Successors implements SuccessorFunction {
             else {
                 for (int j = 0; j < Simulation.bicing.getNumStations(); ++j) {
                     Boolean shouldBeDestination = Simulation.bicing.getDemandNextHour(j) > state.getBicyclesNextHour(i);
-                    if (dock && !shouldBeDestination) {
+                    if (!dock || (dock  && shouldBeDestination) ) {
                         Integer maxB = Simulation.bicing.getStationDoNotMove(i);
                         for (int z = 1; z < 30 && z <= maxB; ++z) {
                              BicingState newState = new BicingState(state.getMovements().size(), state.getMovements(), state.getAvailableBicyclesNextHour());
                              newState.addMovement(new Transport(i,j,z));
-                             successors.add(new Successor(i + " -> " + j + "(" + z + ")", newState));
+                             successors.add(new Successor("Added movement: " + i + " -> " + j + "(" + z + ")", newState));
                         }
                     }
                 }
