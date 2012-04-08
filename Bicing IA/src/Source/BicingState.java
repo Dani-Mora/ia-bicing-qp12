@@ -14,7 +14,6 @@ import java.util.List;
  */
 public class BicingState {
        
-    private Integer[] bicBalanceOnStation;
     private List<Transport> movements;
     
     private Integer initialState = 1;
@@ -23,13 +22,8 @@ public class BicingState {
         this.initialState = initialState;
     }
 
-    BicingState(Integer numStations) {
+    BicingState() {
         this.movements = new ArrayList<Transport>();
-        this.bicBalanceOnStation = new Integer[numStations];   
-    }
-    
-    BicingState(List<Transport> movements) {
-        this.movements = movements;
     }
     
     BicingState(Integer nm, List<Transport> mov) {
@@ -60,6 +54,7 @@ public class BicingState {
     
 
     private void calculateSimpleInitialState() {
+        Integer[] bicBalanceOnStation = new Integer[Simulation.bicing.getNumStations()];
         //mph
         System.out.println("SITUATION ANALYSIS STARTED");
         
@@ -81,7 +76,7 @@ public class BicingState {
             //using these 3 values, we calculate the max amount of bicycles
             //we could move from station "i"
             int bicycleSurplus = calculateBicycleSurplus(donotmove, nexthour, demand);
-            this.bicBalanceOnStation[i] = bicycleSurplus; //aqui es donde iremos sumando o restando a partir de los movimientos que hagamos
+            bicBalanceOnStation[i] = bicycleSurplus; //aqui es donde iremos sumando o restando a partir de los movimientos que hagamos
             if (bicycleSurplus > 0) {
                 // afegim estacio que te bicis sobrants
                 System.out.println("BICYCLES WE CAN TAKE: " + bicycleSurplus);
@@ -147,14 +142,27 @@ public class BicingState {
         return movements;
     }
 
-    public void setMovements(List<Transport> movements) {
-        this.movements = movements;
-    }   
+    public void eraseMovement(Transport transp) {
+        this.movements.remove(transp);
+    }
     
-    public Integer getBalancedIndex(Integer station) {
-        System.out.println("Looking for index of: " + station);
-        for (int i = 0; i < this.bicBalanceOnStation.length; ++i) System.out.println(this.bicBalanceOnStation[i]);
-        return this.bicBalanceOnStation[station];
+    public void addMovement(Transport transp) {
+        this.movements.add(transp);
+    }
+    
+    public Boolean stationAlreadyOrigin(Integer station) {
+        Iterator iterator = this.movements.iterator();
+        while(iterator.hasNext()) {
+            Transport transp = (Transport) iterator.next();
+            if (transp.getOrigin().equals(station)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public Integer getNextStatePlusMovements(Integer station) {
+        return Simulation.bicing.getStationNextState(station) + this.getReceivedBicycles(station);
     }
     
     // No sé si la usaremos porque ya tenemos el balanced, pero la he hecho por si acaso
@@ -208,16 +216,6 @@ public class BicingState {
        
     public void removeMovement(Integer index) {
         this.movements.remove(index);
-    }
-    
-    public void MoveBicycles(Integer origin, Integer destination, Integer amount) {
-        this.bicBalanceOnStation[origin] -= amount;
-        this.bicBalanceOnStation[destination] += amount;
-    }
-    
-    public void MoveBicyclesTwoDestinations(Integer origin, Integer dest1, Integer dest2, Integer amount, Integer secondDestinationAmount) {
-        this.MoveBicycles(origin, dest1, amount - secondDestinationAmount);
-        this.MoveBicycles(origin, dest2, amount - secondDestinationAmount);
     }
     
     // ** TODO **/
