@@ -72,7 +72,8 @@ public class Successors implements SuccessorFunction {
     
     private List getSuccessorsA(BicingState state) {
         ArrayList successors = new ArrayList();
-        Integer numStations = this.context.getNumStations();                   
+        Integer numStations = this.context.getNumStations(); 
+        BicingHeuristic bicingHF = new BicingHeuristic(context);
         // Simple movements
         System.out.println("Generació de successors");
         //Primer generem tots els intercanvis d'origen
@@ -98,6 +99,8 @@ public class Successors implements SuccessorFunction {
                 newState.editBicycleAmount(i, newAmountB);
                 newState.exchangeOrigin(i, j);
                 //System.out.println("a");
+                double d = bicingHF.getSimpleHeuristic(newState);
+                System.out.println("Successors newState heuristic = " + d);
                 successors.add(new Successor("Exchange, " + i + "<->" + j, newState));
             }
         }
@@ -131,6 +134,8 @@ public class Successors implements SuccessorFunction {
                     newAmount = Math.min(newAmount, 30);
                     newState.editBicycleAmount(i, newAmount);
                      //System.out.println("b");
+                    double d = bicingHF.getSimpleHeuristic(newState);
+                    System.out.println("Successors newState heuristic = " + d);
                     successors.add(new Successor("Edit destination, transport" + i + " goes now to->" + movementDest, newState));
                 }
             }

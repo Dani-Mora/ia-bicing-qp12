@@ -103,7 +103,7 @@ public class BicingHeuristic implements HeuristicFunction {
     
 
     
-    protected double getSimpleHeuristic(BicingState st) {
+    public double getSimpleHeuristic(BicingState st) {
         /*
         Random rnd = new Random();
         Double r = rnd.nextDouble();System.out.println("SIMPLE HEURISTIC, = " + r);
