@@ -33,11 +33,11 @@ public class BicingHeuristic implements HeuristicFunction {
     }
     
     protected Double calculateOriginOutcome(Transport t, BicingState state) {
-        Integer demanded, indexOrigin, currentBalanced;
-        indexOrigin = t.getOrigin(); System.out.println("indexOrigin = " + indexOrigin);
-        currentBalanced = state.getBalancedIndex(indexOrigin);
+        Integer demanded, indexOrigin, current;
+        indexOrigin = t.getOrigin(); System.out.println("Heuristic. indexOrigin = " + indexOrigin);
+        current = state.getNextStatePlusMovements(indexOrigin);
         demanded = Simulation.bicing.getDemandNextHour(indexOrigin);
-        Integer aux = currentBalanced - t.getBicyclesAmount();
+        Integer aux = current - t.getBicyclesAmount();
         if (aux >= demanded) return 0.0;       
         else {
             //deixem l'estacio per baix de la demanda
@@ -46,14 +46,14 @@ public class BicingHeuristic implements HeuristicFunction {
     }
     
     protected Double calculateDestinationIncome(Transport t, BicingState state) {
-        Integer demand, indexDest, currentBalanced;
+        Integer demand, indexDest, current;
         indexDest = t.getPreferredDestination();
-        currentBalanced = state.getBalancedIndex(indexDest);
+        current = state.getNextStatePlusMovements(indexDest);
         demand = Simulation.bicing.getDemandNextHour(indexDest);
         
-        Integer newAmount = currentBalanced + t.getBicyclesAmount();
+        Integer newAmount = current + t.getBicyclesAmount();
         if (newAmount <= demand) return t.getBicyclesAmount().doubleValue();
-        else return demand.doubleValue() - currentBalanced.doubleValue();
+        else return demand.doubleValue() - current.doubleValue();
     }
     
     protected Double calculateIncome(Transport t, BicingState state) {

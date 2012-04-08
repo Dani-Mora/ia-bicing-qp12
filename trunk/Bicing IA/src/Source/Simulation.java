@@ -72,11 +72,8 @@ public class Simulation {
     }
     
     public static void main(String[] args){
-        Random rand = new Random();
-        Bicing bicing = new Bicing(NUM_EST,NUM_BIC, DEMAND, rand.nextInt());
-        BicingState initialState = new BicingState(NUM_EST);
+        BicingState initialState = new BicingState();
         System.out.println("****************SIMPLE******************");
-        //initialState.calculateInitialState(bicing, NUM_BIC);
         initialState.calculateInitialState();
         printState(initialState, bicing);
         //System.out.println("****************COMPLEX******************");
