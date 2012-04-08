@@ -15,7 +15,7 @@ import java.util.List;
 public class BicingState {
        
     private List<Transport> movements;
-    private Integer[] availableBicyclesNextHour;
+    private Integer[] estimatedBicyclesNextHour;
     
     private Integer initialState = 1;
 
@@ -25,7 +25,7 @@ public class BicingState {
 
     BicingState() {
         this.movements = new ArrayList<Transport>();
-        this.availableBicyclesNextHour = new Integer[Simulation.bicing.getNumStations()];
+        this.estimatedBicyclesNextHour = new Integer[Simulation.bicing.getNumStations()];
     }
     
     BicingState(Integer nm, List<Transport> mov, Integer[] availableB) {
@@ -33,9 +33,9 @@ public class BicingState {
         for (int i = 0; i < mov.size(); ++i) {
             this.movements.add(mov.get(i));
         }
-        this.availableBicyclesNextHour = new Integer[availableB.length];
+        this.estimatedBicyclesNextHour = new Integer[availableB.length];
         for (int i = 0; i < availableB.length; ++i) {
-            this.availableBicyclesNextHour[i] = availableB[i];
+            this.estimatedBicyclesNextHour[i] = availableB[i];
         }
     } 
 
@@ -60,7 +60,6 @@ public class BicingState {
     }   
 
     private void calculateSimpleInitialState() {
-        Integer[] bicBalanceOnStation = new Integer[Simulation.bicing.getNumStations()];
         //mph
         System.out.println("SITUATION ANALYSIS STARTED");
         
@@ -82,7 +81,7 @@ public class BicingState {
             //using these 3 values, we calculate the max amount of bicycles
             //we could move from station "i"
             int bicycleSurplus = calculateBicycleSurplus(donotmove, nexthour, demand);
-            bicBalanceOnStation[i] = bicycleSurplus; //aqui es donde iremos sumando o restando a partir de los movimientos que hagamos
+            this.estimatedBicyclesNextHour[i] = bicycleSurplus; //aqui es donde iremos sumando o restando a partir de los movimientos que hagamos
             if (bicycleSurplus > 0) {
                 // afegim estacio que te bicis sobrants
                 System.out.println("BICYCLES WE CAN TAKE: " + bicycleSurplus);
@@ -113,16 +112,16 @@ public class BicingState {
                 if (!stationsInNeed.isEmpty()) {
                     indexDest = stationsInNeed.get(0); //first element on this list
                     int bicToTransport, balanceOrigin, balanceDest;
-                    balanceOrigin = bicBalanceOnStation[indexOrigin];
-                    balanceDest = bicBalanceOnStation[indexDest];
+                    balanceOrigin = this.estimatedBicyclesNextHour[indexOrigin];
+                    balanceDest = this.estimatedBicyclesNextHour[indexDest];
                     // Agafo el mínim del que necessiten, del que hi ha a orige i de 30
                     bicToTransport = Math.min(balanceOrigin, Math.abs(balanceDest));
                     bicToTransport = Math.min(bicToTransport, 30);
                     ++movementCount;
-                    bicBalanceOnStation[indexOrigin] -= bicToTransport;
-                    bicBalanceOnStation[indexDest] += bicToTransport;
+                    this.estimatedBicyclesNextHour[indexOrigin] -= bicToTransport;
+                    this.estimatedBicyclesNextHour[indexDest] += bicToTransport;
                     stationsToSpare.remove(0); //la estacion de origen es inmediatamente eliminada de la lista
-                    if (bicBalanceOnStation[indexDest] >= 0) {
+                    if (this.estimatedBicyclesNextHour[indexDest] >= 0) {
                         stationsInNeed.remove(0); //si la de destino está ya cubierta, la quitamos
                     }
                     Transport t = new Transport(indexOrigin, indexDest, bicToTransport);
@@ -133,8 +132,8 @@ public class BicingState {
                     System.out.println("ORIGIN ST: " + indexOrigin);
                     System.out.println("DEST ST: " + indexDest);
                     System.out.println("BICYCLE AMOUNT: " + bicToTransport);
-                    System.out.println("BALANCE BEFORE AND AFTER (OR) " + balanceOrigin + "   " + bicBalanceOnStation[indexOrigin]);
-                    System.out.println("BALANCE BEFORE AND AFTER (DEST) " + balanceDest + "   " + bicBalanceOnStation[indexDest]);
+                    System.out.println("BALANCE BEFORE AND AFTER (OR) " + balanceOrigin + "   " + this.estimatedBicyclesNextHour[indexOrigin]);
+                    System.out.println("BALANCE BEFORE AND AFTER (DEST) " + balanceDest + "   " + this.estimatedBicyclesNextHour[indexDest]);
                 }
                 else System.out.println("ERROR: stationsInNeed is Empty - This cannot happen");
             }
@@ -151,10 +150,26 @@ public class BicingState {
     }
 
     public void eraseMovement(Transport transp) {
+        this.estimatedBicyclesNextHour[transp.getOrigin()] += transp.getBicyclesAmount();
+        if (transp.HasTwoDestinations()) {
+            this.estimatedBicyclesNextHour[transp.getPreferredDestination()] -= transp.getBicyclesAmount() - transp.getBicyclesToSecondDest();
+            this.estimatedBicyclesNextHour[transp.getSecondDestination()] -= transp.getBicyclesToSecondDest();
+        }
+        else {
+            this.estimatedBicyclesNextHour[transp.getPreferredDestination()] -= transp.getBicyclesAmount();
+        }
         this.movements.remove(transp);
     }
     
     public void addMovement(Transport transp) {
+        this.estimatedBicyclesNextHour[transp.getOrigin()] -= transp.getBicyclesAmount();
+        if (transp.HasTwoDestinations()) {
+            this.estimatedBicyclesNextHour[transp.getPreferredDestination()] += transp.getBicyclesAmount() - transp.getBicyclesToSecondDest();
+            this.estimatedBicyclesNextHour[transp.getSecondDestination()] += transp.getBicyclesToSecondDest();
+        }
+        else {
+            this.estimatedBicyclesNextHour[transp.getPreferredDestination()] += transp.getBicyclesAmount();
+        }
         this.movements.add(transp);
     }
     
@@ -194,15 +209,15 @@ public class BicingState {
     // AVAILABLE BICYCLES //
     
     public Integer getBicyclesNextHour(Integer station) {
-        return this.availableBicyclesNextHour[station];
+        return this.estimatedBicyclesNextHour[station];
     }
     
     public void setBicyclesNextHour(Integer station, Integer newAmount) {
-        this.availableBicyclesNextHour[station] = newAmount;
+        this.estimatedBicyclesNextHour[station] = newAmount;
     }
 
     public Integer[] getAvailableBicyclesNextHour() {
-        return availableBicyclesNextHour;
+        return estimatedBicyclesNextHour;
     }
     
     
