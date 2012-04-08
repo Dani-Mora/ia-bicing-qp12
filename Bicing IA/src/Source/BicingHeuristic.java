@@ -67,7 +67,7 @@ public class BicingHeuristic implements HeuristicFunction {
             Integer destStation = (Integer) destsIter.next();
             Integer demand = Simulation.bicing.getDemandNextHour(destStation);
             Integer nextHourEstimate = state.getBicyclesNextHour(destStation);
-            Integer previousAmount = state.getReceivedBycicles(destStation);
+            Integer previousAmount = nextHourEstimate - state.getReceivedBycicles(destStation);
             if (nextHourEstimate > demand) {
                 nextHourEstimate = demand;
             }
@@ -76,7 +76,6 @@ public class BicingHeuristic implements HeuristicFunction {
         return income;
     }
     
-    // nomes hi ha un moviment per origen, per tant aqui ho fem normal
     private Double calculateOriginLoses(BicingState st) { 
         Double loses = 0.0;
         List<Transport> transp = st.getMovements();
@@ -85,8 +84,7 @@ public class BicingHeuristic implements HeuristicFunction {
             Transport current = (Transport) transpIter.next();
             Integer demand = Simulation.bicing.getDemandNextHour(current.getOrigin());
             Integer nextHourEstimate = st.getBicyclesNextHour(current.getOrigin());
-            if (nextHourEstimate < demand) {
-                
+            if (nextHourEstimate < demand) {        
                 loses += current.getBicyclesAmount();
             }
         } 
@@ -128,7 +126,11 @@ public class BicingHeuristic implements HeuristicFunction {
         Double totalInc = 0.0;
         Double originLoses = this.calculateOriginLoses(st);
         Double destinationIncome = this.calculateDestinationIncome(st);
-        return destinationIncome - originLoses;      
+        totalInc = destinationIncome - originLoses  ; // TODO
+        System.out.println("Original loses: " + originLoses);
+        System.out.println("Destination Income: " + destinationIncome);
+        System.out.println("Heuristic: " + totalInc);
+        return totalInc;      
         
     }
     

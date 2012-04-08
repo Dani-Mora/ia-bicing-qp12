@@ -23,9 +23,16 @@ public class BicingState {
         this.initialState = initialState;
     }
 
+    private void initializeEstimations() {
+        for (int i = 0; i < Simulation.bicing.getNumStations(); ++i) {
+            this.estimatedBicyclesNextHour[i] = Simulation.bicing.getStationNextState(i);
+        }
+    }
+    
     BicingState() {
         this.movements = new ArrayList<Transport>();
         this.estimatedBicyclesNextHour = new Integer[Simulation.bicing.getNumStations()];
+        this.initializeEstimations();
     }
     
     BicingState(Integer nm, List<Transport> mov, Integer[] availableB) {
@@ -60,6 +67,7 @@ public class BicingState {
     }   
 
     private void calculateSimpleInitialState() {
+        Integer balancedIndex[] = new Integer[Simulation.bicing.getNumStations()];
         //mph
         System.out.println("SITUATION ANALYSIS STARTED");
         
@@ -81,7 +89,7 @@ public class BicingState {
             //using these 3 values, we calculate the max amount of bicycles
             //we could move from station "i"
             int bicycleSurplus = calculateBicycleSurplus(donotmove, nexthour, demand);
-            this.estimatedBicyclesNextHour[i] = bicycleSurplus; //aqui es donde iremos sumando o restando a partir de los movimientos que hagamos
+            balancedIndex[i] = bicycleSurplus; //aqui es donde iremos sumando o restando a partir de los movimientos que hagamos
             if (bicycleSurplus > 0) {
                 // afegim estacio que te bicis sobrants
                 System.out.println("BICYCLES WE CAN TAKE: " + bicycleSurplus);
@@ -112,16 +120,16 @@ public class BicingState {
                 if (!stationsInNeed.isEmpty()) {
                     indexDest = stationsInNeed.get(0); //first element on this list
                     int bicToTransport, balanceOrigin, balanceDest;
-                    balanceOrigin = this.estimatedBicyclesNextHour[indexOrigin];
-                    balanceDest = this.estimatedBicyclesNextHour[indexDest];
+                    balanceOrigin = balancedIndex[indexOrigin];
+                    balanceDest = balancedIndex[indexDest];
                     // Agafo el mínim del que necessiten, del que hi ha a orige i de 30
                     bicToTransport = Math.min(balanceOrigin, Math.abs(balanceDest));
                     bicToTransport = Math.min(bicToTransport, 30);
                     ++movementCount;
-                    this.estimatedBicyclesNextHour[indexOrigin] -= bicToTransport;
-                    this.estimatedBicyclesNextHour[indexDest] += bicToTransport;
+                    balancedIndex[indexOrigin] -= bicToTransport;
+                    balancedIndex[indexDest] += bicToTransport;
                     stationsToSpare.remove(0); //la estacion de origen es inmediatamente eliminada de la lista
-                    if (this.estimatedBicyclesNextHour[indexDest] >= 0) {
+                    if (balancedIndex[indexDest] >= 0) {
                         stationsInNeed.remove(0); //si la de destino está ya cubierta, la quitamos
                     }
                     Transport t = new Transport(indexOrigin, indexDest, bicToTransport);
@@ -132,8 +140,8 @@ public class BicingState {
                     System.out.println("ORIGIN ST: " + indexOrigin);
                     System.out.println("DEST ST: " + indexDest);
                     System.out.println("BICYCLE AMOUNT: " + bicToTransport);
-                    System.out.println("BALANCE BEFORE AND AFTER (OR) " + balanceOrigin + "   " + this.estimatedBicyclesNextHour[indexOrigin]);
-                    System.out.println("BALANCE BEFORE AND AFTER (DEST) " + balanceDest + "   " + this.estimatedBicyclesNextHour[indexDest]);
+                    System.out.println("BALANCE BEFORE AND AFTER (OR) " + balanceOrigin + "   " + balancedIndex[indexOrigin]);
+                    System.out.println("BALANCE BEFORE AND AFTER (DEST) " + balanceDest + "   " + balancedIndex[indexDest]);
                 }
                 else System.out.println("ERROR: stationsInNeed is Empty - This cannot happen");
             }

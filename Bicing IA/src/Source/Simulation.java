@@ -29,13 +29,13 @@ public class Simulation {
     
     /* Print functions */
     
-    private static void printInfo(Bicing context, Integer i) {
-        System.out.println("No usades: " + context.getStationDoNotMove(i));
-        System.out.println("Hi haura: " + context.getStationNextState(i));
-        System.out.println("Demanda: " + context.getDemandNextHour(i));
+    private static void printInfo(Integer i) {
+        System.out.println("No usades: " + bicing.getStationDoNotMove(i));
+        System.out.println("Hi haura: " + bicing.getStationNextState(i));
+        System.out.println("Demanda: " + bicing.getDemandNextHour(i));
     }
     
-    private static void printState(BicingState state, Bicing context) {
+    private static void printState(BicingState state) {
         ArrayList<Transport> movements = (ArrayList<Transport>) state.getMovements();
         System.out.println("*****printState*****");
         System.out.println("Number of selected movements:" + movements.size());
@@ -52,6 +52,14 @@ public class Simulation {
             }
         }
         
+        Integer aux[] = state.getAvailableBicyclesNextHour();
+        for (int i = 0; i < aux.length; ++i) {
+            System.out.println("Previsió estació : " + i + " " + aux[i]);
+        }
+        
+        BicingHeuristic heuristic = new BicingHeuristic();
+        System.out.println(" ****************************************** dsfsfaf");
+        System.out.println("HEURISTIC ESTAT: " + heuristic.getSimpleHeuristic(state));
         
     }
     
@@ -59,14 +67,14 @@ public class Simulation {
         BicingState initialState = new BicingState();
         System.out.println("****************SIMPLE******************");
         initialState.calculateInitialState();
-        printState(initialState, bicing);
+        printState(initialState);
         //System.out.println("****************COMPLEX******************");
         //initialState.setInitialState(0);
         //initialState.calculateInitialState(bicing, NUM_BIC);
         //printState(initialState, bicing);
            
         ExecuteHillClimbing(initialState);
-        printState(initialState, bicing);
+        printState(initialState);
         //ExecuteSimulatedAnnealing(bicing, initialState);
     }
     
