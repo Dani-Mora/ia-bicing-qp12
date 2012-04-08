@@ -51,7 +51,8 @@ public class Transport {
     public Boolean HasTwoDestinations() {
         return this.secondDestination != -1;
     }
-        public void setBicyclesAmount(Integer bicyclesAmount) {
+        
+    public void setBicyclesAmount(Integer bicyclesAmount) {
         this.bicyclesAmount = bicyclesAmount;
     }
 
