@@ -39,8 +39,11 @@ public class BicingState {
         this.movements = movements;
     }
     
-    BicingState(List<Transport> movements) {
-        this.movements = movements;
+    BicingState(Integer nm, List<Transport> mov) {
+        this.movements = new ArrayList<Transport>(nm);
+        for (int i = 0; i < mov.size(); ++i) {
+            this.movements.add(mov.get(i));
+        }
     }
    
 

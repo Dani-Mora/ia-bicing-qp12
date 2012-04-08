@@ -82,7 +82,7 @@ public class Successors implements SuccessorFunction {
         for (int i = 0; i < state.getMovements().size(); ++i) {
             for (int j = i+1; j < state.getMovements().size(); ++j) {
                 
-                BicingState newState = new BicingState(state.getMovements());
+                BicingState newState = new BicingState(state.getMovements().size(), state.getMovements());
                 
                 int idOrigin, idDest, newAmountA, newAmountB;
                 idOrigin = state.getMovements().get(i).getOrigin();
@@ -128,7 +128,7 @@ public class Successors implements SuccessorFunction {
                 int movementDest = state.getMovements().get(i).getPreferredDestination();
                 int movementOrigin = state.getMovements().get(i).getOrigin();
                 if (DestinationOK(movementDest, stationsInNeed)) {
-                    BicingState newState = new BicingState(state.getMovements());
+                    BicingState newState = new BicingState(state.getMovements().size(), state.getMovements());
                     newState.editDestination(i, movementDest);
                     int newAmount = calculateBicycleAmount(movementOrigin, movementDest);
                     newAmount = Math.min(newAmount, 30);
