@@ -8,6 +8,7 @@ import aima.search.framework.HeuristicFunction;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 /**
  *
@@ -110,6 +111,7 @@ public class BicingHeuristic implements HeuristicFunction {
     }
     
     public double getSimpleHeuristic(BicingState st) { 
+
         /* HEURISTICO SENCILLO
         Double result = 0.0;
         Integer estimation[] = st.getAvailableBicyclesNextHour();
@@ -127,11 +129,11 @@ public class BicingHeuristic implements HeuristicFunction {
         Double originLoses = this.calculateOriginLoses(st);
         Double destinationIncome = this.calculateDestinationIncome(st);
         totalInc = destinationIncome - originLoses  ; // TODO
-        System.out.println("Original loses: " + originLoses);
-        System.out.println("Destination Income: " + destinationIncome);
-        System.out.println("Heuristic: " + totalInc);
+        //System.out.println("Original loses: " + originLoses);
+        //System.out.println("Destination Income: " + destinationIncome);
+        //System.out.println("Heuristic: " + totalInc);
         return totalInc;      
-        
+       
     }
     
 }
