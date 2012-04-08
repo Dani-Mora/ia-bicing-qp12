@@ -36,22 +36,6 @@ public class Simulation {
     }
     
     private static void printState(BicingState state, Bicing context) {
-        //mph
-//        Integer bicycles[] = state.getBicycleDisposition();
-//        ArrayList<Transport> movements = (ArrayList<Transport>) state.getMovements();
-//        Integer totalDemand = 0, totalAssignedBicycles = 0;
-//        for (int i = 0; i < bicycles.length; ++i) {
-//            System.out.println("Estació " + i + " : " + bicycles[i] + " bicycles");
-//            totalDemand += context.getDemandNextHour(i);
-//            totalAssignedBicycles += bicycles[i];
-//            printInfo(context, i);
-//        }
-//        System.out.println("Total Demand: " + totalDemand);
-//        System.out.println("Total Assigned Bicycles: " + totalAssignedBicycles);
-//        System.out.println("Theoretical Bicycles = " + NUM_BIC);
-//        for (int i = 0; i < movements.size(); ++i) {
-//            System.out.println("Movement " + i + " : " + movements.get(i).getOrigin() + " - " + movements.get(i).getBicyclesAmount() + "-> " + movements.get(i).getPreferredDestination() + "," + movements.get(i).getSecondDestination() + "(" + movements.get(i).getBicyclesToSecondDest() + ")");
-//        }
         ArrayList<Transport> movements = (ArrayList<Transport>) state.getMovements();
         System.out.println("*****printState*****");
         System.out.println("Number of selected movements:" + movements.size());

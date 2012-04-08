@@ -5,6 +5,8 @@
 package Source;
 
 import aima.search.framework.HeuristicFunction;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -32,65 +34,102 @@ public class BicingHeuristic implements HeuristicFunction {
         return ((nb.doubleValue() / 10) + 1) * dist; // corregido, es / i no %, aviso del raco
     }
     
-    protected Double calculateOriginOutcome(Transport t, BicingState state) {
-        Integer demanded, indexOrigin, current;
-        indexOrigin = t.getOrigin(); System.out.println("Heuristic. indexOrigin = " + indexOrigin);
-        current = state.getNextStatePlusMovements(indexOrigin);
-        demanded = Simulation.bicing.getDemandNextHour(indexOrigin);
-        Integer aux = current - t.getBicyclesAmount();
-        if (aux >= demanded) return 0.0;       
-        else {
-            //deixem l'estacio per baix de la demanda
-            return demanded.doubleValue() - aux.doubleValue();      
+    private List getDistinctDestinations(BicingState st) {
+        List<Integer> dests = new ArrayList<Integer>();
+        Iterator transpIter = st.getMovements().iterator();
+        while(transpIter.hasNext()) {
+            Transport transp = (Transport)transpIter.next();
+            Integer currentDesp = (Integer) transp.getPreferredDestination(); 
+            if (!dests.contains(currentDesp)) {
+                dests.add((Integer) transp.getPreferredDestination());
+            }
+            if (transp.HasTwoDestinations() && !dests.contains(transp.getSecondDestination())) {
+                dests.add((Integer) transp.getSecondDestination());
+            }
         }
+        return dests;
     }
     
-    protected Double calculateDestinationIncome(Transport t, BicingState state) {
-        Integer demand, indexDest, current;
+    protected Double calculateDestinationIncome(BicingState state) {
+        /*Integer demand, indexDest, current;
         indexDest = t.getPreferredDestination();
         current = state.getNextStatePlusMovements(indexDest);
         demand = Simulation.bicing.getDemandNextHour(indexDest);
         
         Integer newAmount = current + t.getBicyclesAmount();
         if (newAmount <= demand) return t.getBicyclesAmount().doubleValue();
-        else return demand.doubleValue() - current.doubleValue();
-    }
-    
-    protected Double calculateIncome(Transport t, BicingState state) {
-        Double originBalance, destinationBalance; 
-        originBalance = calculateOriginOutcome(t, state);
-        destinationBalance = calculateDestinationIncome(t, state);System.out.println("originBalance = " + originBalance + " destinationBalance = " + destinationBalance);
-        return destinationBalance - originBalance;
-    }
-    
-    protected double getComplexHeuristic(BicingState st) {
-        List<Transport> movements = st.getMovements();
-        Double totalInc = 0.0;
-        for (int i = 0; i < movements.size(); ++i) {
-            Transport transp = movements.get(i);
-            Double income = calculateIncome(transp, st);
-            Double cost = calculateCost(transp);
-            totalInc += income - cost;
+        else return demand.doubleValue() - current.doubleValue();*/
+        Double income = 0.0;        
+   
+        // We evaluate the final disposition of all the movements
+        Iterator destsIter = this.getDistinctDestinations(state).iterator();
+        while(destsIter.hasNext()) {
+            Integer destStation = (Integer) destsIter.next();
+            Integer demand = Simulation.bicing.getDemandNextHour(destStation);
+            Integer nextHourEstimate = state.getBicyclesNextHour(destStation);
+            Integer previousAmount = state.getReceivedBycicles(destStation);
+            if (nextHourEstimate > demand) {
+                nextHourEstimate = demand;
+            }
+            income = (Double) (nextHourEstimate.doubleValue() - previousAmount.doubleValue());
         }
-        System.out.println("COMPLEX HEURISTIC, totalInc = " + totalInc);
-        return totalInc;
+        return income;
     }
     
-    public double getSimpleHeuristic(BicingState st) {
-        /*
-        Random rnd = new Random();
-        Double r = rnd.nextDouble();System.out.println("SIMPLE HEURISTIC, = " + r);
-        return r;
+    // nomes hi ha un moviment per origen, per tant aqui ho fem normal
+    private Double calculateOriginLoses(BicingState st) { 
+        Double loses = 0.0;
+        List<Transport> transp = st.getMovements();
+        Iterator transpIter = transp.iterator();
+        while(transpIter.hasNext()) {
+            Transport current = (Transport) transpIter.next();
+            Integer demand = Simulation.bicing.getDemandNextHour(current.getOrigin());
+            Integer nextHourEstimate = st.getBicyclesNextHour(current.getOrigin());
+            if (nextHourEstimate < demand) {
+                
+                loses += current.getBicyclesAmount();
+            }
+        } 
+        return loses;
+    }
+    
+    private Double getAllTransportCosts(BicingState st) {
+        Double cost = 0.0;
+        List<Transport> transp = st.getMovements();
+        Iterator transpIter = transp.iterator();
+        while(transpIter.hasNext()) {
+            cost += this.calculateCost((Transport) transpIter.next());
+        } 
+        return cost;
+    }
+    
+    protected Double getComplexHeuristic(BicingState st) {
+        Double result  = this.getSimpleHeuristic(st) + this.getAllTransportCosts(st);
+        Double originLoses = this.calculateOriginLoses(st);
+        Double destinationIncome = this.calculateDestinationIncome(st);
+        System.out.println("COMPLEX HEURISTIC, totalInc = " + result);
+        return result;
+    }
+    
+    public double getSimpleHeuristic(BicingState st) { 
+        /* HEURISTICO SENCILLO
+        Double result = 0.0;
+        Integer estimation[] = st.getAvailableBicyclesNextHour();
+        for (int i = 0; i < estimation.length; ++i) {
+            Integer currentStationDemand = Simulation.bicing.getDemandNextHour(i);
+            if (estimation[i] < currentStationDemand) {
+                result += currentStationDemand - estimation[i];
+            }
+        }
+        
+        return 1/result; // inversa, porque nos interesa que sea mínimo
         */
-        List<Transport> movements = st.getMovements();
+
         Double totalInc = 0.0;
-        for (int i = 0; i < movements.size(); ++i) {
-            Transport transp = movements.get(i);
-            Double income = calculateIncome(transp, st);           
-            totalInc += income;
-        }
-        System.out.println("SIMPLE HEURISTIC, totalInc = " + totalInc);
-        return totalInc;
+        Double originLoses = this.calculateOriginLoses(st);
+        Double destinationIncome = this.calculateDestinationIncome(st);
+        return destinationIncome - originLoses;      
+        
     }
     
 }
