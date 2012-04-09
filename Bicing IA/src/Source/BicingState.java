@@ -133,8 +133,9 @@ public class BicingState {
                         stationsInNeed.remove(0); //si la de destino está ya cubierta, la quitamos
                     }
                     Transport t = new Transport(indexOrigin, indexDest, bicToTransport);
-                    boolean add = movements.add(t);
-                    if (!add) System.out.println("ERROR WHEN ADDING A MOVEMENT TO THE LIST");
+                    //boolean add = movements.add(t);
+                    this.addMovement(t);
+                    //if (!add) System.out.println("ERROR WHEN ADDING A MOVEMENT TO THE LIST");
                     
                     System.out.println("MOVEMENT " + movementCount + " SELECTED ");
                     System.out.println("ORIGIN ST: " + indexOrigin);
