@@ -59,7 +59,7 @@ public class BicingState {
     }
     
     private void calculateComplexInitialState() {
-        //
+             
     }
     
     private int calculateBicycleSurplus(int doNotMove, int nextHour, int demand) {

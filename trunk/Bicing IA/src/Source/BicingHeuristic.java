@@ -16,7 +16,7 @@ import java.util.Random;
  */
 public class BicingHeuristic implements HeuristicFunction {
 
-    private final Integer heuristicUsed = 1;
+    private final Integer heuristicUsed = 0;
     
     @Override
     public double getHeuristicValue(Object o) {
@@ -103,14 +103,31 @@ public class BicingHeuristic implements HeuristicFunction {
     }
     
     protected Double getComplexHeuristic(BicingState st) {
-        Double result  = this.getSimpleHeuristic(st) + this.getAllTransportCosts(st);
+//        Double result  = this.getSimpleHeuristic(st) + this.getAllTransportCosts(st);
+//        Double originLoses = this.calculateOriginLoses(st);
+//        Double destinationIncome = this.calculateDestinationIncome(st);
+//        System.out.println("COMPLEX HEURISTIC, totalInc = " + result);
+//        return result;
+        
+        Double result  = this.getSimpleHeuristicRAW(st) - this.getAllTransportCosts(st);
+        //if (result < 0.0) return 0.0;
+        //System.out.println("COMPLEX HEURISTIC, totalInc = " + result);
+        return (100000000.0 - result);
+    }
+    
+    public double getSimpleHeuristicRAW(BicingState st) {
+        Double totalInc = 0.0;
         Double originLoses = this.calculateOriginLoses(st);
         Double destinationIncome = this.calculateDestinationIncome(st);
-        System.out.println("COMPLEX HEURISTIC, totalInc = " + result);
-        return result;
+        totalInc = destinationIncome - originLoses  ; // TODO
+        //System.out.println("Original loses|Dest Income|Heuristic: " + originLoses + "|" + destinationIncome + "|" + totalInc);
+        //System.out.println("Destination Income: " + destinationIncome);
+        //System.out.println("Heuristic: " + totalInc);
+        return totalInc;      
     }
     
     public double getSimpleHeuristic(BicingState st) { 
+        return 1.0 / getSimpleHeuristicRAW(st);
 
 //        Random r = new Random();
 //        Double d = r.nextDouble(); //System.out.println(d);
@@ -129,15 +146,15 @@ public class BicingHeuristic implements HeuristicFunction {
         */
         
 
-        Double totalInc = 0.0, aa = 1000000.0;
-        Double originLoses = this.calculateOriginLoses(st);
-        Double destinationIncome = this.calculateDestinationIncome(st);
-        totalInc = destinationIncome - originLoses  ; // TODO
-        System.out.println("Original loses|Dest Income|Heuristic: " + originLoses + "|" + destinationIncome + "|" + totalInc);
-        //System.out.println("Destination Income: " + destinationIncome);
-        //System.out.println("Heuristic: " + totalInc);
-        return 1.0 / totalInc;      
-       
+//        Double totalInc = 0.0;
+//        Double originLoses = this.calculateOriginLoses(st);
+//        Double destinationIncome = this.calculateDestinationIncome(st);
+//        totalInc = destinationIncome - originLoses  ; // TODO
+//        //System.out.println("Original loses|Dest Income|Heuristic: " + originLoses + "|" + destinationIncome + "|" + totalInc);
+//        //System.out.println("Destination Income: " + destinationIncome);
+//        //System.out.println("Heuristic: " + totalInc);
+//        return 1.0 / totalInc;      
+//       
     }
     
 }
