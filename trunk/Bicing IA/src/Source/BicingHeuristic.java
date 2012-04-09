@@ -111,7 +111,9 @@ public class BicingHeuristic implements HeuristicFunction {
     }
     
     public double getSimpleHeuristic(BicingState st) { 
-
+/*
+        Random r = new Random();
+        return r.nextDouble();*/
         /* HEURISTICO SENCILLO
         Double result = 0.0;
         Integer estimation[] = st.getAvailableBicyclesNextHour();
@@ -124,12 +126,13 @@ public class BicingHeuristic implements HeuristicFunction {
         
         return 1/result; // inversa, porque nos interesa que sea mínimo
         */
+        
 
         Double totalInc = 0.0;
         Double originLoses = this.calculateOriginLoses(st);
         Double destinationIncome = this.calculateDestinationIncome(st);
         totalInc = destinationIncome - originLoses  ; // TODO
-        //System.out.println("Original loses: " + originLoses);
+        System.out.println("Original loses|Dest Income|Heuristic: " + originLoses + "|" + destinationIncome + "|" + totalInc);
         //System.out.println("Destination Income: " + destinationIncome);
         //System.out.println("Heuristic: " + totalInc);
         return totalInc;      
