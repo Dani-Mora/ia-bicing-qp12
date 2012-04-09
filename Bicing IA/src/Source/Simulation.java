@@ -20,10 +20,13 @@ import java.util.Random;
  * @author Dani
  */
 public class Simulation {
-    
+
+
+
     public static final Integer NUM_VANS = 6;
     public static final Integer NUM_BIC = 1500;
     private static final Integer NUM_EST = 25;
+
     public static final Integer DEMAND = 0;
     public static Bicing bicing = new Bicing(NUM_EST,NUM_BIC, DEMAND, new Random().nextInt());
     
@@ -84,8 +87,9 @@ public class Simulation {
         try {
             Problem problem = new Problem(initSt, new Successors(), new FinalCondition(), new BicingHeuristic());
             Search search =  new HillClimbingSearch();
+          
             SearchAgent agent = new SearchAgent(problem,search);
-            
+           
             System.out.println();
             printActions(agent.getActions());
             printInstrumentation(agent.getInstrumentation());

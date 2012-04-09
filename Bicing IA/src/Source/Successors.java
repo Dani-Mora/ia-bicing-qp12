@@ -135,8 +135,8 @@ public class Successors implements SuccessorFunction {
                     BicingState newState = new BicingState(state.getMovements().size(), state.getMovements(), state.getAllBicyclesNextHour());
                     int newAmount = calculateBicycleAmount(movementOrigin, movementDest);               
                     newAmount = Math.min(newAmount, 30);
-                    //System.out.println("getTransportChanges I, J, movOrigin, movDest, newAmount "
-                    //        + i + " " + j + " " + movementOrigin+ " "  + movementDest + " " + newAmount);
+                    System.out.println("getTransportChanges I, J, movOrigin, movDest, newAmount "
+                            + i + " " + j + " " + movementOrigin+ " "  + movementDest + " " + newAmount);
                     //newState.editDestination(i, movementDest, newAmount);
                     newState.eraseMovement(state.getMovements().get(i));
                     newState.addMovement(new Transport(movementOrigin,movementDest,newAmount));
@@ -144,8 +144,8 @@ public class Successors implements SuccessorFunction {
                     //newState.editBicycleAmount(i, newAmount);
                         //System.out.println("b");
 
-                    //double d = bicingHF.getComplexHeuristic(newState);
-                    //System.out.println("Successors newState heuristic = " + d);
+                    double d = bicingHF.getHeuristicValue(newState);
+                    System.out.println("Successors newState heuristic = " + d);
 
                     successors.add(new Successor("Edit destination, origin" + movementOrigin + " goes now to-> " + movementDest + " ", newState));
                 }
@@ -188,8 +188,8 @@ public class Successors implements SuccessorFunction {
                     int newAmount = calculateBicycleAmount(movementOrig, movementDest);  
                     if (newAmount > 0) {
                         newAmount = Math.min(newAmount, 30);
-                        //System.out.println("getTransportChanges I, J, movDEST->movORIG, newAmount "
-                        //        + i + " " + j + " " + movementDest+ " "  + movementOrig + " " + newAmount);
+                        System.out.println("getTransportChanges I, J, movDEST->movORIG, newAmount "
+                                + i + " " + j + " " + movementDest+ " "  + movementOrig + " " + newAmount);
                         //newState.editDestination(i, movementDest, newAmount);
                         newState.eraseMovement(state.getMovements().get(i));
                         newState.addMovement(new Transport(movementOrig, movementDest,newAmount));
@@ -197,8 +197,8 @@ public class Successors implements SuccessorFunction {
                         //newState.editBicycleAmount(i, newAmount);
                             //System.out.println("b");
 
-                        //double d = bicingHF.getComplexHeuristic(newState);
-                        //System.out.println("Successors newState heuristic = " + d);
+                        double d = bicingHF.getHeuristicValue(newState);
+                        System.out.println("Successors newState heuristic = " + d);
 
                         successors.add(new Successor("Edit ORIGIN, destination is: " + movementDest + " receives now from-> " + movementOrig + " ", newState));
                     }
@@ -291,6 +291,7 @@ public class Successors implements SuccessorFunction {
     private List UnifyTransports(BicingState state) {
         ArrayList successors = new ArrayList();
         Iterator iterator =  state.getMovements().iterator();
+        BicingHeuristic bicingHF = new BicingHeuristic();  
         while(iterator.hasNext()) {
             Transport transp1 = (Transport) iterator.next();
             if (!transp1.HasTwoDestinations()) {          
@@ -312,6 +313,9 @@ public class Successors implements SuccessorFunction {
                             newState.eraseMovement(transp1);
                             newState.eraseMovement(transp2);
                             newState.addMovement(unifiedTransport);
+                            System.out.println("UnifyTransports, Origin1|Dest1|Dest2|Total|Amount2" + origin1 + " " + dest1+ " " + dest2+ " " + total+ " " + amount2);
+                            double d = bicingHF.getHeuristicValue(newState);
+                            System.out.println("Successors newState heuristic = " + d);
                             successors.add(new Successor("Unified movement", newState));
                     }
                 }

@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class BicingHeuristic implements HeuristicFunction {
 
-    private final Integer heuristicUsed = 1;
+    private final Integer heuristicUsed = 0;
     
     @Override
     public double getHeuristicValue(Object o) {
@@ -92,11 +92,12 @@ public class BicingHeuristic implements HeuristicFunction {
         return cost;
     }
     
-    protected Double getComplexHeuristic(BicingState st) {       
-        Double result  = this.getSimpleHeuristicRAW(st) - this.getAllTransportCosts(st);
+    protected Double getComplexHeuristic(BicingState st) {  
+        Double costs = this.getAllTransportCosts(st);
+        Double result  = this.getSimpleHeuristicRAW(st) - costs;
         //if (result < 0.0) return 0.0;
-        //System.out.println("COMPLEX HEURISTIC, totalInc = " + result);
-        return (100000000.0 - result);
+        System.out.println("COMPLEX HEURISTIC, costs|totalInc = " + costs + "|" + result);
+        return (1000000000.0 - result);
     }
     
     public double getSimpleHeuristicRAW(BicingState st) {
@@ -104,15 +105,15 @@ public class BicingHeuristic implements HeuristicFunction {
         Double originLoses = this.calculateOriginLoses(st);
         Double destinationIncome = this.calculateDestinationIncome(st);
         totalInc = destinationIncome - originLoses  ; // TODO
-        //System.out.println("Original loses|Dest Income|Heuristic: " + originLoses + "|" + destinationIncome + "|" + totalInc);
+        System.out.println("Original loses|Dest Income|Heuristic: " + originLoses + "|" + destinationIncome + "|" + totalInc);
         //System.out.println("Destination Income: " + destinationIncome);
         //System.out.println("Heuristic: " + totalInc);
         return totalInc;      
     }
     
     public double getSimpleHeuristic(BicingState st) { 
-        return 1.0 / getSimpleHeuristicRAW(st);
-
+        //return 1.0 / getSimpleHeuristicRAW(st);
+        return 1000000000.0 - getSimpleHeuristicRAW(st);
         /* HEURISTICO SENCILLO
         Double result = 0.0;
         Integer estimation[] = st.getAvailableBicyclesNextHour();
