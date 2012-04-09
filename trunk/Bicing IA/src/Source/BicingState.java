@@ -207,7 +207,7 @@ public class BicingState {
         Integer counter = 0;
         origin = rand.nextInt(numStations);
         Boolean improvement = this.getBicyclesNextHour(origin) < Simulation.bicing.getDemandNextHour(origin);
-        while (!intelligentOrigin && !this.stationAlreadyOrigin(origin) || intelligentOrigin && !this.stationAlreadyOrigin(origin) && improvement ) {
+        while (!this.stationAlreadyOrigin(origin) && Simulation.bicing.getStationDoNotMove(origin) == 0 && (!intelligentOrigin || intelligentOrigin && improvement)) {
             origin = rand.nextInt(numStations);
             improvement = this.getBicyclesNextHour(origin) < Simulation.bicing.getDemandNextHour(origin);
             if (++counter >= numStations) break;
