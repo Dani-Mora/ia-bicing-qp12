@@ -26,13 +26,13 @@ public class Successors implements SuccessorFunction {
          System.out.println("Tamany de agregar transports: " + hola.size());
          successors.addAll(hola);
         }
-        //List hola1 = this.EraseTransports(state);
+        List hola1 = this.EraseTransports(state);
         List hola2 = this.UnifyTransports(state);
        List hola3 = this.getTransportChanges(state);
        List hola4 = this.getOriginChanges(state);
        List hola5 = this.getExtraDestinations(state, false);
         
-       //System.out.println("Tamany d'eliminar transports: " + hola1.size());
+       System.out.println("Tamany d'eliminar transports: " + hola1.size());
         System.out.println("Tamany d'unificar transports: " + hola2.size());
         System.out.println("Tamany de canviar DESTINACIONS: " + hola3.size());
         System.out.println("Tamany de canviar ORIGENS: " + hola4.size());
@@ -41,7 +41,7 @@ public class Successors implements SuccessorFunction {
         successors.addAll(hola5);
         successors.addAll(hola3);
         successors.addAll(hola4);
-        //successors.addAll(hola1);
+        successors.addAll(hola1);
 //        
         successors.addAll(hola2);
         
@@ -361,6 +361,7 @@ public class Successors implements SuccessorFunction {
                         for (int z = 1; z < 30 && z <= maxB; ++z) {
                              BicingState newState = new BicingState(state.getMovements().size(), state.getMovements(), state.getAllBicyclesNextHour());
                              newState.addMovement(new Transport(i,j,z));
+
                              successors.add(new Successor("Added movement: " + i + " -> " + j + "(" + z + ")", newState));
                         }
                     }
@@ -373,13 +374,26 @@ public class Successors implements SuccessorFunction {
     // creo estats redundants, TODO FIX
     private List EraseTransports(BicingState state) {
         ArrayList successors = new ArrayList();
-        Iterator iterator =  state.getMovements().iterator();
-        while(iterator.hasNext()) {
-            BicingState newState = new BicingState(state.getMovements().size(), state.getMovements(), state.getAllBicyclesNextHour());                           
-            newState.eraseMovement((Transport) iterator.next());
-            successors.add(new Successor("Erased movement", newState));          
-        }        
+        BicingHeuristic bicingHF = new BicingHeuristic();       
+        for (int i = 0; i < state.getMovements().size(); ++i) {
+            BicingState newState = new BicingState(state.getMovements().size(), state.getMovements(), state.getAllBicyclesNextHour());   
+            newState.eraseMovement(i);
+            double d = bicingHF.getHeuristicValue(newState);
+            System.out.println("Successors newState heuristic = " + d);
+            successors.add(new Successor("Erased movement " + i, newState));  
+        }
+        
+        
+//        Iterator iterator =  state.getMovements().iterator();
+//        while(iterator.hasNext()) {
+//            BicingState newState = new BicingState(state.getMovements().size(), state.getMovements(), state.getAllBicyclesNextHour());                           
+//            newState.eraseMovement((Transport) iterator.next());
+//            successors.add(new Successor("Erased movement", newState));          
+//        }   
+        
         return successors;
+        
+
     }
     
     private List UnifyTransports(BicingState state) {
