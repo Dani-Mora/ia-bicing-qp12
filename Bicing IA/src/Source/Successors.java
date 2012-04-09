@@ -82,7 +82,7 @@ public class Successors implements SuccessorFunction {
         for (int i = 0; i < state.getMovements().size(); ++i) {
             for (int j = i+1; j < state.getMovements().size(); ++j) {
                 
-                BicingState newState = new BicingState(state.getMovements().size(), state.getMovements(), state.getAvailableBicyclesNextHour());
+                BicingState newState = new BicingState(state.getMovements().size(), state.getMovements(), state.getAllBicyclesNextHour());
                 
                 int idOrigin, idDest, newAmountA, newAmountB;
                 idOrigin = state.getMovements().get(i).getOrigin();
@@ -132,7 +132,7 @@ public class Successors implements SuccessorFunction {
                 Integer movementDest = stationsInNeed.get(j);
                 Integer movementOrigin = state.getMovements().get(i).getOrigin();
                 if (!movementDest.equals(movementOrigin)) {
-                    BicingState newState = new BicingState(state.getMovements().size(), state.getMovements(), state.getAvailableBicyclesNextHour());
+                    BicingState newState = new BicingState(state.getMovements().size(), state.getMovements(), state.getAllBicyclesNextHour());
                     int newAmount = calculateBicycleAmount(movementOrigin, movementDest);               
                     newAmount = Math.min(newAmount, 30);
                     //System.out.println("getTransportChanges I, J, movOrigin, movDest, newAmount "
@@ -184,7 +184,7 @@ public class Successors implements SuccessorFunction {
                 Integer movementOrig = stationsToSpare.get(j);
                 
                 if (!movementOrig.equals(movementDest)) {
-                    BicingState newState = new BicingState(state.getMovements().size(), state.getMovements(), state.getAvailableBicyclesNextHour());
+                    BicingState newState = new BicingState(state.getMovements().size(), state.getMovements(), state.getAllBicyclesNextHour());
                     int newAmount = calculateBicycleAmount(movementOrig, movementDest);  
                     if (newAmount > 0) {
                         newAmount = Math.min(newAmount, 30);
@@ -265,7 +265,7 @@ public class Successors implements SuccessorFunction {
                     if (!dock || (dock  && shouldBeDestination) ) {
                         Integer maxB = Simulation.bicing.getStationDoNotMove(i);
                         for (int z = 1; z < 30 && z <= maxB; ++z) {
-                             BicingState newState = new BicingState(state.getMovements().size(), state.getMovements(), state.getAvailableBicyclesNextHour());
+                             BicingState newState = new BicingState(state.getMovements().size(), state.getMovements(), state.getAllBicyclesNextHour());
                              newState.addMovement(new Transport(i,j,z));
                              successors.add(new Successor("Added movement: " + i + " -> " + j + "(" + z + ")", newState));
                         }
@@ -281,7 +281,7 @@ public class Successors implements SuccessorFunction {
         ArrayList successors = new ArrayList();
         Iterator iterator =  state.getMovements().iterator();
         while(iterator.hasNext()) {
-            BicingState newState = new BicingState(state.getMovements().size(), state.getMovements(), state.getAvailableBicyclesNextHour());                           
+            BicingState newState = new BicingState(state.getMovements().size(), state.getMovements(), state.getAllBicyclesNextHour());                           
             newState.eraseMovement((Transport) iterator.next());
             successors.add(new Successor("Erased movement", newState));          
         }        
@@ -307,7 +307,7 @@ public class Successors implements SuccessorFunction {
                         Integer total = amount1 + amount2;
                         // Let's see if we can unify and that the origin has enough bicycles
                         if (Simulation.bicing.getStationDoNotMove(origin1) >= total) {
-                            BicingState newState = new BicingState(state.getMovements().size(), state.getMovements(), state.getAvailableBicyclesNextHour());                       
+                            BicingState newState = new BicingState(state.getMovements().size(), state.getMovements(), state.getAllBicyclesNextHour());                       
                             Transport unifiedTransport = new Transport(origin1, dest1, dest2, total, amount2);
                             newState.eraseMovement(transp1);
                             newState.eraseMovement(transp2);

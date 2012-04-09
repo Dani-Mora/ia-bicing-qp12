@@ -43,7 +43,7 @@ public class SuccessorsSA implements SuccessorFunction {
             amount = rand.nextInt(Simulation.bicing.getStationDoNotMove(origin));
         }
                 
-        BicingState newState = new BicingState(state.getMovements().size(), state.getMovements(), state.getAvailableBicyclesNextHour());
+        BicingState newState = new BicingState(state.getMovements().size(), state.getMovements(), state.getAllBicyclesNextHour());
         newState.addMovement(new Transport(origin, dest, amount));
         return successors;
     }
