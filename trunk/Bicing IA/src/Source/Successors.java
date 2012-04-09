@@ -30,7 +30,7 @@ public class Successors implements SuccessorFunction {
         List hola2 = this.UnifyTransports(state);
        List hola3 = this.getTransportChanges(state);
        List hola4 = this.getOriginChanges(state);
-       List hola5 = this.getExtraDestinations(state, false);
+       List hola5 = this.getExtraDestinations(state, true);
         
        System.out.println("Tamany d'eliminar transports: " + hola1.size());
         System.out.println("Tamany d'unificar transports: " + hola2.size());
@@ -38,12 +38,13 @@ public class Successors implements SuccessorFunction {
         System.out.println("Tamany de canviar ORIGENS: " + hola4.size());
         System.out.println("Tamany de AFEGIR DESTINACIO: " + hola5.size());
         
+        successors.addAll(hola5);
         successors.addAll(hola3);
         successors.addAll(hola4);
         successors.addAll(hola1);
 //        
         successors.addAll(hola2);
-        successors.addAll(hola5);
+        
         
         System.out.println("Generació de successors"); 
         return successors;
@@ -154,7 +155,7 @@ public class Successors implements SuccessorFunction {
                             newAmount = Math.min(newAmount, 30);
                             if (newAmount > 0) {
                                 System.out.println("getExtraDestination I, J, movOrigin, movDestFIRST, movDestSECOND, amountFIRST, amountSECOND "
-                                    + i + " " + j + " " + movementOrigin+ " "+ movementFirstDest  + movementNewSecondDest + amountToFirst + " " + newAmount);
+                                    + i + " " + j + " " + movementOrigin+ " "+ movementFirstDest+ " "  + movementNewSecondDest+ " " + amountToFirst + " " + newAmount);
                         
                                 newState.eraseMovement(state.getMovements().get(i));
                                 newState.addMovement(new Transport(movementOrigin, movementFirstDest, movementNewSecondDest, amountToFirst + newAmount, newAmount));
@@ -173,7 +174,7 @@ public class Successors implements SuccessorFunction {
                                     int amountFirst = k+1, amountSecond = bicyclesToShare - (k+1);
 
                                     System.out.println("getExtraDestination I, J, movOrigin, movDestFIRST, movDestSECOND, amountFIRST, amountSECOND "
-                                        + i + " " + j + " " + movementOrigin+ " "+ movementFirstDest  + movementNewSecondDest + amountFirst + " " + amountSecond);
+                                        + i + " " + j + " " + movementOrigin+ " "+ movementFirstDest+ " "  + movementNewSecondDest+ " " + amountFirst + " " + amountSecond);
 
                                     newState.eraseMovement(state.getMovements().get(i));
                                     newState.addMovement(new Transport(movementOrigin, movementFirstDest, movementNewSecondDest, amountFirst + amountSecond, amountSecond));
