@@ -157,13 +157,17 @@ public class BicingState {
     public void eraseMovement(Transport transp) {
         this.estimatedBicyclesNextHour[transp.getOrigin()] += transp.getBicyclesAmount();
         if (transp.HasTwoDestinations()) {
-            this.estimatedBicyclesNextHour[transp.getPreferredDestination()] -= transp.getBicyclesAmount() - transp.getBicyclesToSecondDest();
+            this.estimatedBicyclesNextHour[transp.getPreferredDestination()] -= (transp.getBicyclesAmount() - transp.getBicyclesToSecondDest());
             this.estimatedBicyclesNextHour[transp.getSecondDestination()] -= transp.getBicyclesToSecondDest();
         }
         else {
             this.estimatedBicyclesNextHour[transp.getPreferredDestination()] -= transp.getBicyclesAmount();
         }
         this.movements.remove(transp);
+    }
+    
+    public void eraseMovement(Integer index) {
+        this.eraseMovement(this.movements.get(index));
     }
     
     // pre: Not all movements done yet

@@ -62,7 +62,7 @@ public class BicingHeuristic implements HeuristicFunction {
             if (nextHourEstimate > demand) {
                 nextHourEstimate = demand;
             }
-            income = (Double) (nextHourEstimate.doubleValue() - previousAmount.doubleValue());
+            income += (Double) (nextHourEstimate.doubleValue() - previousAmount.doubleValue());
         }
         return income;
     }
@@ -105,6 +105,9 @@ public class BicingHeuristic implements HeuristicFunction {
         Double originLoses = this.calculateOriginLoses(st);
         Double destinationIncome = this.calculateDestinationIncome(st);
         totalInc = destinationIncome - originLoses  ; // TODO
+//        for (int i = 0; i < Simulation.bicing.getNumStations(); ++i) {
+//            System.out.println("NEXTHOUR BICYCLES on station " + i + " : " + st.getBicyclesNextHour(i));
+//        }
         //System.out.println("Original loses|Dest Income|Heuristic: " + originLoses + "|" + destinationIncome + "|" + totalInc);
         //System.out.println("Destination Income: " + destinationIncome);
         //System.out.println("Heuristic: " + totalInc);
