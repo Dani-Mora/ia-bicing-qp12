@@ -21,9 +21,9 @@ import java.util.Random;
  */
 public class Simulation {
     
-    public static final Integer NUM_VANS = 35;
-    public static final Integer NUM_BIC = 8750;
-    private static final Integer NUM_EST = 175;
+    public static final Integer NUM_VANS = 80;
+    public static final Integer NUM_BIC = 20000;
+    private static final Integer NUM_EST = 400;
     public static final Integer DEMAND = 0;
     public static Bicing bicing = new Bicing(NUM_EST,NUM_BIC, DEMAND, new Random().nextInt());
     
@@ -74,7 +74,7 @@ public class Simulation {
         //printState(initialState, bicing);
            
         ExecuteHillClimbing(initialState);
-        printState(initialState);
+        //printState(initialState);
         //ExecuteSimulatedAnnealing(bicing, initialState);
     }
     
