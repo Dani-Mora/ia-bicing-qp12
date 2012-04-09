@@ -176,6 +176,7 @@ public class BicingState {
         else {
             this.estimatedBicyclesNextHour[transp.getPreferredDestination()] += transp.getBicyclesAmount();
         }
+        System.out.println("Afegit moviment: " + transp.getOrigin() + " -> " + transp.getPreferredDestination() + " (" + transp.getBicyclesAmount() + ")" );
         this.movements.add(transp);
     }
     
@@ -207,19 +208,19 @@ public class BicingState {
         origin = rand.nextInt(numStations);
         Boolean improvement = this.getBicyclesNextHour(origin) < Simulation.bicing.getDemandNextHour(origin);
         while (!intelligentOrigin && !this.stationAlreadyOrigin(origin) || intelligentOrigin && !this.stationAlreadyOrigin(origin) && improvement ) {
-            origin = rand.nextInt();
+            origin = rand.nextInt(numStations);
             improvement = this.getBicyclesNextHour(origin) < Simulation.bicing.getDemandNextHour(origin);
             if (++counter >= numStations) break;
         }
         
-        if (counter < numStations) {
-            origin = rand.nextInt();
+        if (counter >= numStations) {
+            origin = rand.nextInt(numStations);
         }
         
-        dest = rand.nextInt();
+        dest = rand.nextInt(numStations);
         amount = Math.min(30,rand.nextInt(Simulation.bicing.getStationDoNotMove(origin)));
-        while (dest != origin) {
-            dest = rand.nextInt();
+        while (dest == origin) {
+            dest = rand.nextInt(numStations);
             amount = Math.min(30,rand.nextInt(Simulation.bicing.getStationDoNotMove(origin)));
         }
         this.addMovement(new Transport(origin, dest, amount));

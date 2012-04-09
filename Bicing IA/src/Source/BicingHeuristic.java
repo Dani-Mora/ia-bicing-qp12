@@ -15,17 +15,20 @@ import java.util.List;
  */
 public class BicingHeuristic implements HeuristicFunction {
 
-    private final Integer heuristicUsed = 0;
+    private final Integer heuristicUsed = 1;
     
     @Override
     public double getHeuristicValue(Object o) {
         BicingState st = (BicingState) o;      
+        Double heuristic = 0.0;
         if (heuristicUsed == 0) {
-            return this.getComplexHeuristic(st);    
+            heuristic = this.getComplexHeuristic(st);    
         }
         else {
-            return this.getSimpleHeuristic(st);
+            heuristic = this.getSimpleHeuristic(st);
         }
+        System.out.println("Heuristic: " + heuristic);
+        return heuristic;
     }
     
     protected Double calculateCost(Transport t) {
