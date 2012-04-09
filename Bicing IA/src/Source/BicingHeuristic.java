@@ -29,9 +29,7 @@ public class BicingHeuristic implements HeuristicFunction {
     }
     
     protected Double calculateCost(Transport t) {
-        Double dist = Simulation.bicing.getStationsDistance(t.getOrigin(), t.getPreferredDestination());
-        Integer nb = t.getBicyclesAmount();
-        return ((nb.doubleValue() / 10) + 1) * dist;
+        return t.calculateCost();
     }
     
     private List getDistinctDestinations(BicingState st) {
