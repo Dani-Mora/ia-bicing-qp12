@@ -19,7 +19,7 @@ public class BicingState {
     private List<Transport> movements;
     private Integer[] estimatedBicyclesNextHour;
     
-    private Integer initialState = 1;
+    private Integer initialState = 0;
 
     public void setInitialState(Integer initialState) {
         this.initialState = initialState;
@@ -176,7 +176,7 @@ public class BicingState {
         else {
             this.estimatedBicyclesNextHour[transp.getPreferredDestination()] += transp.getBicyclesAmount();
         }
-        System.out.println("Afegit moviment: " + transp.getOrigin() + " -> " + transp.getPreferredDestination() + " (" + transp.getBicyclesAmount() + ")" );
+        //System.out.println("Afegit moviment: " + transp.getOrigin() + " -> " + transp.getPreferredDestination() + " (" + transp.getBicyclesAmount() + ")" );
         this.movements.add(transp);
     }
     
