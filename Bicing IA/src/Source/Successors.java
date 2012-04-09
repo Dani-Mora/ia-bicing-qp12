@@ -26,13 +26,13 @@ public class Successors implements SuccessorFunction {
 //         System.out.println("Tamany de agregar transports: " + hola.size());
 //         successors.addAll(hola);
 //        }
-//        List hola1 = this.EraseTransports(state);
-//        List hola2 = this.UnifyTransports(state);
+     //   List hola1 = this.EraseTransports(state);
+        List hola2 = this.UnifyTransports(state);
        List hola3 = this.getTransportChanges(state);
        List hola4 = this.getOriginChanges(state);
         
-//        System.out.println("Tamany d'eliminar transports: " + hola1.size());
-//        System.out.println("Tamany d'unificar transports: " + hola2.size());
+       // System.out.println("Tamany d'eliminar transports: " + hola1.size());
+        System.out.println("Tamany d'unificar transports: " + hola2.size());
         System.out.println("Tamany de canviar DESTINACIONS: " + hola3.size());
         System.out.println("Tamany de canviar ORIGENS: " + hola4.size());
         
@@ -40,7 +40,7 @@ public class Successors implements SuccessorFunction {
         successors.addAll(hola4);
 //        successors.addAll(hola1);
 //        
-//        successors.addAll(hola2);
+        successors.addAll(hola2);
         
         System.out.println("Generació de successors"); 
         return successors;
@@ -306,7 +306,7 @@ public class Successors implements SuccessorFunction {
                         Integer amount2 = transp2.getBicyclesAmount();
                         Integer total = amount1 + amount2;
                         // Let's see if we can unify and that the origin has enough bicycles
-                        if (origin2.equals(dest1) && Simulation.bicing.getStationDoNotMove(origin1) >= total) {
+                        if (Simulation.bicing.getStationDoNotMove(origin1) >= total) {
                             BicingState newState = new BicingState(state.getMovements().size(), state.getMovements(), state.getAvailableBicyclesNextHour());                       
                             Transport unifiedTransport = new Transport(origin1, dest1, dest2, total, amount2);
                             newState.eraseMovement(transp1);
