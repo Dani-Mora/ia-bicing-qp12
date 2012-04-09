@@ -21,9 +21,9 @@ import java.util.Random;
  */
 public class Simulation {
     
-    public static final Integer NUM_VANS = 80;
-    public static final Integer NUM_BIC = 20000;
-    private static final Integer NUM_EST = 400;
+    public static final Integer NUM_VANS = 20;
+    public static final Integer NUM_BIC = 5000;
+    private static final Integer NUM_EST = 100;
     public static final Integer DEMAND = 0;
     public static Bicing bicing = new Bicing(NUM_EST,NUM_BIC, DEMAND, new Random().nextInt());
     
