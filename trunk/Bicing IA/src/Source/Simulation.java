@@ -52,7 +52,7 @@ public class Simulation {
             }
         }
         
-        Integer aux[] = state.getAvailableBicyclesNextHour();
+        Integer aux[] = state.getAllBicyclesNextHour();
         for (int i = 0; i < aux.length; ++i) {
             System.out.println("Previsió estació : " + i + " " + aux[i]);
         }

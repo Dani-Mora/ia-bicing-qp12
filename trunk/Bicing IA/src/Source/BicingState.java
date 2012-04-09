@@ -30,16 +30,19 @@ public class BicingState {
     }
     
     BicingState() {
+        // Initializations
         this.movements = new ArrayList<Transport>();
         this.estimatedBicyclesNextHour = new Integer[Simulation.bicing.getNumStations()];
         this.initializeEstimations();
     }
     
     BicingState(Integer nm, List<Transport> mov, Integer[] availableB) {
+        // Copy movements
         this.movements = new ArrayList<Transport>(nm);
         for (int i = 0; i < mov.size(); ++i) {
             this.movements.add(mov.get(i));
         }
+        // Copy estimations
         this.estimatedBicyclesNextHour = new Integer[availableB.length];
         for (int i = 0; i < availableB.length; ++i) {
             this.estimatedBicyclesNextHour[i] = availableB[i];
@@ -62,41 +65,31 @@ public class BicingState {
              
     }
     
-    private int calculateBicycleSurplus(int doNotMove, int nextHour, int demand) {
+    // We calculate the max amount of bicycles we could move from station "i"
+    private int calculateBicycleSurplus(Integer station) {
+        int doNotMove, nextHour, demand;
+        doNotMove = Simulation.bicing.getStationDoNotMove(station);
+        nextHour = Simulation.bicing.getStationNextState(station);
+        demand = Simulation.bicing.getDemandNextHour(station);
+        System.out.println("Station " + station + " DO NOT MOVE " + doNotMove + " NEXT HOUR " + nextHour + " DEMAND " + demand);
         return Math.min(nextHour - demand, doNotMove);
     }   
 
-    private void calculateSimpleInitialState() {
-        Integer balancedIndex[] = new Integer[Simulation.bicing.getNumStations()];
-        //mph
+    private void calculateSimpleInitialState() {       
         System.out.println("SITUATION ANALYSIS STARTED");
         
-        //1. WE SPLIT THE STATIONS INTO 2 GROUPS, THOSE IN NEED OF BICYCLES
-        //  AND THOSE WITH EXTRA BICYCLES
-        //2. LISTS ARE  NOT SORTED (se podria hacer)
-        //3. ITERATION FROM 0 TO F (OR THE LENGTH OF THE EXTRA LIST, MOVEMENTS ARE ASSIGNED
-        // PROGRESSIVELY UP UNTIL EITHER LIST IS FINISHED >>OR<< THE F MOVEMENTS HAVE BEEN
-        // ALREADY DECIDED
-        
+        Integer balancedIndex[] = new Integer[Simulation.bicing.getNumStations()];
         ArrayList<Integer> stationsInNeed = new ArrayList<Integer>(), stationsToSpare = new ArrayList<Integer>();
         
-        for (int i = 0; i < Simulation.bicing.getNumStations(); ++i) {
-            int donotmove, nexthour, demand, bicyclesToSpare;
-            donotmove = Simulation.bicing.getStationDoNotMove(i);
-            nexthour = Simulation.bicing.getStationNextState(i);
-            demand = Simulation.bicing.getDemandNextHour(i);
-            System.out.println("Station " + i + " DO NOT MOVE " + donotmove + " NEXT HOUR " + nexthour + " DEMAND " + demand);
-            //using these 3 values, we calculate the max amount of bicycles
-            //we could move from station "i"
-            int bicycleSurplus = calculateBicycleSurplus(donotmove, nexthour, demand);
-            balancedIndex[i] = bicycleSurplus; //aqui es donde iremos sumando o restando a partir de los movimientos que hagamos
+        // Diferenciem d'estacions que necessiten bicis i estacions que li sobren
+        for (int i = 0; i < Simulation.bicing.getNumStations(); ++i) {                      
+            Integer bicycleSurplus = calculateBicycleSurplus(i);
+            balancedIndex[i] = bicycleSurplus;
             if (bicycleSurplus > 0) {
-                // afegim estacio que te bicis sobrants
                 System.out.println("BICYCLES WE CAN TAKE: " + bicycleSurplus);
                 stationsToSpare.add(i);
             }
             else if (bicycleSurplus < 0) {
-                // estacio que necessita bicis
                 System.out.println("BICYCLES NEEDED: " + bicycleSurplus);
                 stationsInNeed.add(i);
             }
@@ -104,48 +97,47 @@ public class BicingState {
                 System.out.println("NO BICYCLES AVAILABLE");
             }
         }
-            //ahora generamos los movimientos, iteraremos por las dos listas, y se
-            // irán asignando movimientos de estaciones de una lista a otra
-            // una vez asignado, se descontarán y sumarán esas bicis en el bicAvailableOnStation
-            // por ultimo, eliminamos de la lista la estación de origen y si la de destino ya tiene
-//              suficientes bicis, se quitará de la lista también. Si se termina la lista de InNeed (que no debe pasar)
-//               o bien la lista de ToSpare (que se supone que ha de pasar), paramos, y los movimientos resultantes son
-//               nuestra solucion inicial.
-//                No tenemos en cuenta nada mas, por el momento
         
-        //primera version: meto bicis de la primera posicion ToSpare a la primera InNeed, tal cual
-            int movementCount = 0;
-            while (!stationsToSpare.isEmpty() && !stationsInNeed.isEmpty() && movementCount < Simulation.NUM_VANS) {
-                int indexOrigin = stationsToSpare.get(0), indexDest;
-                if (!stationsInNeed.isEmpty()) {
-                    indexDest = stationsInNeed.get(0); //first element on this list
-                    int bicToTransport, balanceOrigin, balanceDest;
-                    balanceOrigin = balancedIndex[indexOrigin];
-                    balanceDest = balancedIndex[indexDest];
-                    // Agafo el mínim del que necessiten, del que hi ha a orige i de 30
-                    bicToTransport = Math.min(balanceOrigin, Math.abs(balanceDest));
-                    bicToTransport = Math.min(bicToTransport, 30);
-                    ++movementCount;
-                    balancedIndex[indexOrigin] -= bicToTransport;
-                    balancedIndex[indexDest] += bicToTransport;
-                    stationsToSpare.remove(0); //la estacion de origen es inmediatamente eliminada de la lista
-                    if (balancedIndex[indexDest] >= 0) {
-                        stationsInNeed.remove(0); //si la de destino está ya cubierta, la quitamos
-                    }
-                    Transport t = new Transport(indexOrigin, indexDest, bicToTransport);
-                    //boolean add = movements.add(t);
-                    this.addMovement(t);
-                    //if (!add) System.out.println("ERROR WHEN ADDING A MOVEMENT TO THE LIST");
-                    
-                    System.out.println("MOVEMENT " + movementCount + " SELECTED ");
-                    System.out.println("ORIGIN ST: " + indexOrigin);
-                    System.out.println("DEST ST: " + indexDest);
-                    System.out.println("BICYCLE AMOUNT: " + bicToTransport);
-                    System.out.println("BALANCE BEFORE AND AFTER (OR) " + balanceOrigin + "   " + balancedIndex[indexOrigin]);
-                    System.out.println("BALANCE BEFORE AND AFTER (DEST) " + balanceDest + "   " + balancedIndex[indexDest]);
+        // anem fent moviments de bicis de les toSpare a les InNeed.
+        // Eliminem de la llista toSpare les que ja siguin origen (restricció) i si el festi
+        // ja te suficients bicis la descartem de la InNeed
+        // Anem assignant de la primera
+        // Condició final: s'acabi alguna de les llistes i/o ja tinguem F moviments
+        
+        int movementCount = 0;
+        while (!stationsToSpare.isEmpty() && !stationsInNeed.isEmpty() && movementCount < Simulation.NUM_VANS) {
+            Integer indexOrigin = stationsToSpare.get(0), indexDest;
+            if (!stationsInNeed.isEmpty()) {
+                Integer bicToTransport, balanceOrigin, balanceDest;
+                indexDest = stationsInNeed.get(0); //first element on this list           
+                balanceOrigin = balancedIndex[indexOrigin];
+                balanceDest = balancedIndex[indexDest];
+                // Agafo el mínim del que necessiten, del que hi ha a orige i de 30
+                bicToTransport = Math.min(balanceOrigin, Math.abs(balanceDest));
+                bicToTransport = Math.min(bicToTransport, 30);
+
+                balancedIndex[indexOrigin] -= bicToTransport;
+                balancedIndex[indexDest] += bicToTransport;
+                
+                Transport t = new Transport(indexOrigin, indexDest, bicToTransport);
+                this.addMovement(t);
+                ++movementCount;
+                
+                if (balancedIndex[indexDest] >= 0) {
+                    stationsInNeed.remove(0);
                 }
-                else System.out.println("ERROR: stationsInNeed is Empty - This cannot happen");
+                
+                stationsToSpare.remove(0); //la estacion de origen es inmediatamente eliminada de la lista
+
+                System.out.println("MOVEMENT " + movementCount + " SELECTED ");
+                System.out.println("ORIGIN ST: " + indexOrigin);
+                System.out.println("DEST ST: " + indexDest);
+                System.out.println("BICYCLE AMOUNT: " + bicToTransport);
+                System.out.println("BALANCE BEFORE AND AFTER (OR) " + balanceOrigin + "   " + balancedIndex[indexOrigin]);
+                System.out.println("BALANCE BEFORE AND AFTER (DEST) " + balanceDest + "   " + balancedIndex[indexDest]);
             }
+            else System.out.println("ERROR: stationsInNeed is Empty - This cannot happen");
+        }
         
         System.out.println("NUMBER OF MOVEMENTS DECIDED: " + movementCount);     
         
@@ -225,7 +217,7 @@ public class BicingState {
         this.estimatedBicyclesNextHour[station] = newAmount;
     }
 
-    public Integer[] getAvailableBicyclesNextHour() {
+    public Integer[] getAllBicyclesNextHour() {
         return estimatedBicyclesNextHour;
     }
     
