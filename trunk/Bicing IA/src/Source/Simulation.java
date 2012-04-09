@@ -21,9 +21,9 @@ import java.util.Random;
  */
 public class Simulation {
     
-    public static final Integer NUM_VANS = 20;
-    public static final Integer NUM_BIC = 5000;
-    private static final Integer NUM_EST = 100;
+    public static final Integer NUM_VANS = 6;
+    public static final Integer NUM_BIC = 1500;
+    private static final Integer NUM_EST = 25;
     public static final Integer DEMAND = 0;
     public static Bicing bicing = new Bicing(NUM_EST,NUM_BIC, DEMAND, new Random().nextInt());
     
@@ -54,6 +54,7 @@ public class Simulation {
         
         Integer aux[] = state.getAllBicyclesNextHour();
         for (int i = 0; i < aux.length; ++i) {
+            printInfo(i);
             System.out.println("Previsió estació : " + i + " " + aux[i]);
         }
         
