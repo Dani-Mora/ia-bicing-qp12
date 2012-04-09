@@ -71,4 +71,26 @@ public class Transport {
     public void setSecondDestination(Integer secondDestination) {
         this.secondDestination = secondDestination;
     }
+    
+    private Double calculateJourney(Double dist, Integer amount) {
+        return ((amount.doubleValue() / 10) + 1) * dist;
+    }
+    
+    public Double calculateCost() {
+        Double result = 0.0;
+        Double dist = Simulation.bicing.getStationsDistance(this.getOrigin(), this.getPreferredDestination());
+        if (this.HasTwoDestinations()) {
+            // First journey
+            Integer firstAmount = this.bicyclesAmount - this.bicyclesToSecondDest;
+            result += this.calculateJourney(dist, firstAmount);
+            // Second Journey
+            Integer secondAmount = this.bicyclesToSecondDest;
+            Double secondDist = Simulation.bicing.getStationsDistance(this.getPreferredDestination(), this.getSecondDestination());
+            result += this.calculateJourney(secondDist, secondAmount);
+        }
+        else {
+            result = this.calculateJourney(dist, this.getBicyclesAmount());
+        }
+        return result;
+    }
 }

@@ -5,8 +5,10 @@
 package Source;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 /**
  *
@@ -62,20 +64,6 @@ public class BicingState {
     }
     
     private void calculateComplexInitialState() {
-             
-    }
-    
-    // We calculate the max amount of bicycles we could move from station "i"
-    private int calculateBicycleSurplus(Integer station) {
-        int doNotMove, nextHour, demand;
-        doNotMove = Simulation.bicing.getStationDoNotMove(station);
-        nextHour = Simulation.bicing.getStationNextState(station);
-        demand = Simulation.bicing.getDemandNextHour(station);
-        System.out.println("Station " + station + " DO NOT MOVE " + doNotMove + " NEXT HOUR " + nextHour + " DEMAND " + demand);
-        return Math.min(nextHour - demand, doNotMove);
-    }   
-
-    private void calculateSimpleInitialState() {       
         System.out.println("SITUATION ANALYSIS STARTED");
         
         Integer balancedIndex[] = new Integer[Simulation.bicing.getNumStations()];
@@ -143,6 +131,22 @@ public class BicingState {
         
         System.out.println("SITUATION ANALYSIS FINISHED");
     }
+    
+    // We calculate the max amount of bicycles we could move from station "i"
+    private int calculateBicycleSurplus(Integer station) {
+        int doNotMove, nextHour, demand;
+        doNotMove = Simulation.bicing.getStationDoNotMove(station);
+        nextHour = Simulation.bicing.getStationNextState(station);
+        demand = Simulation.bicing.getDemandNextHour(station);
+        System.out.println("Station " + station + " DO NOT MOVE " + doNotMove + " NEXT HOUR " + nextHour + " DEMAND " + demand);
+        return Math.min(nextHour - demand, doNotMove);
+    }   
+
+    private void calculateSimpleInitialState() {       
+        for (int i = 0; i < Simulation.NUM_VANS; ++i) {
+            this.AddRandomMovement(Boolean.FALSE);
+        }
+    }
 
     // MOVEMENTS //
     
@@ -162,6 +166,7 @@ public class BicingState {
         this.movements.remove(transp);
     }
     
+    // pre: Not all movements done yet
     public void addMovement(Transport transp) {
         this.estimatedBicyclesNextHour[transp.getOrigin()] -= transp.getBicyclesAmount();
         if (transp.HasTwoDestinations()) {
@@ -172,6 +177,60 @@ public class BicingState {
             this.estimatedBicyclesNextHour[transp.getPreferredDestination()] += transp.getBicyclesAmount();
         }
         this.movements.add(transp);
+    }
+    
+    public void editDestination(Integer indexMovement, Integer newDestination, Integer newAmount) {
+        Transport t = this.movements.get(indexMovement);
+        Integer oldAmount = t.getBicyclesAmount(), oldDest = t.getPreferredDestination();
+        Integer origin = t.getOrigin();
+        
+        this.estimatedBicyclesNextHour[oldDest] -= oldAmount;
+        this.estimatedBicyclesNextHour[origin] += oldAmount;
+        
+        this.estimatedBicyclesNextHour[newDestination] += newAmount;
+        this.estimatedBicyclesNextHour[origin] -= newAmount;
+        
+        t.setBicyclesAmount(newAmount);
+        t.setPreferredDestination(newDestination);
+        
+        this.movements.set(indexMovement, t);
+    }
+    
+    // problema: pot decidir agafar 0 bicis
+    // TODO improve
+    // intelligentOrigin: agafa bicis només d'on sobrin i fa numStations intents. Sinó, agafa una qualssevol
+    public void AddRandomMovement(Boolean intelligentOrigin) {
+        Random rand = new Random();
+        Integer origin, dest, amount, numStations = Simulation.bicing.getNumStations();
+        
+        Integer counter = 0;
+        origin = rand.nextInt(numStations);
+        Boolean improvement = this.getBicyclesNextHour(origin) < Simulation.bicing.getDemandNextHour(origin);
+        while (!intelligentOrigin && !this.stationAlreadyOrigin(origin) || intelligentOrigin && !this.stationAlreadyOrigin(origin) && improvement ) {
+            origin = rand.nextInt();
+            improvement = this.getBicyclesNextHour(origin) < Simulation.bicing.getDemandNextHour(origin);
+            if (++counter >= numStations) break;
+        }
+        
+        if (counter < numStations) {
+            origin = rand.nextInt();
+        }
+        
+        dest = rand.nextInt();
+        amount = Math.min(30,rand.nextInt(Simulation.bicing.getStationDoNotMove(origin)));
+        while (dest != origin) {
+            dest = rand.nextInt();
+            amount = Math.min(30,rand.nextInt(Simulation.bicing.getStationDoNotMove(origin)));
+        }
+        this.addMovement(new Transport(origin, dest, amount));
+    }
+    
+    public void EraseRandomMovement() {
+        List<Transport> transports = this.getMovements();     
+        if (transports.size() > 0) {
+            Collections.shuffle(transports);
+            this.eraseMovement((Transport)transports.iterator().next());
+        }    
     }
     
     public Integer getReceivedBycicles(Integer station) {
@@ -227,44 +286,27 @@ public class BicingState {
     public void exchangeOrigin(Integer indexA, Integer indexB) {
         Transport tA, tB;
         int valueA, valueB;
-        tA = this.movements.get(indexA); valueA = tA.getOrigin();
-        tB = this.movements.get(indexB); valueB = tB.getOrigin();
+        
+        tA = this.movements.get(indexA); 
+        valueA = tA.getOrigin();
+        tB = this.movements.get(indexB); 
+        valueB = tB.getOrigin();
+        
+        this.estimatedBicyclesNextHour[indexA] += tB.getBicyclesAmount() - tA.getBicyclesAmount();
+        this.estimatedBicyclesNextHour[indexB] += tA.getBicyclesAmount() - tB.getBicyclesAmount();
         
         tA.setOrigin(valueB);
         tB.setOrigin(valueA);
         
-        this.movements.set(indexA, tA);
-        this.movements.set(indexB, tB);
+        this.movements.set(indexA, tA); // caldria fer aixo?
+        this.movements.set(indexB, tB); // caldria fer aixo?
     }
     
+    // TODO arreglar
     public void editBicycleAmount(Integer index, Integer newAmount) {
         Transport t = this.movements.get(index);
         t.setBicyclesAmount(newAmount);
         this.movements.set(index, t);
-    }
-    
-    public void editDestination(Integer indexMovement, Integer newDestination) {
-        Transport t;
-        t = this.movements.get(indexMovement);
-        t.setPreferredDestination(newDestination);
-        this.movements.set(indexMovement, t);
-    }
-    
-    public void editDestination(Integer indexMovement, Integer newDestination, Integer newAmount) {
-        Transport t = this.movements.get(indexMovement);
-        Integer oldAmount = t.getBicyclesAmount(), oldDest = t.getPreferredDestination();
-        Integer origin = t.getOrigin();
-        
-        this.estimatedBicyclesNextHour[oldDest] -= oldAmount;
-        this.estimatedBicyclesNextHour[origin] += oldAmount;
-        
-        this.estimatedBicyclesNextHour[newDestination] += newAmount;
-        this.estimatedBicyclesNextHour[origin] -= newAmount;
-        
-        t.setBicyclesAmount(newAmount);
-        t.setPreferredDestination(newDestination);
-        
-        this.movements.set(indexMovement, t);
     }
     
     // ** TODO **/
