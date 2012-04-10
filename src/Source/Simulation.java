@@ -23,12 +23,12 @@ public class Simulation {
 
     public static Integer numSuc = 0;
 
-    public static final Integer simpleHeuristic = 1;
-    public static final Integer simpleInitialState = 0;
+    public static final Integer simpleHeuristic = 0;
+    public static final Integer simpleInitialState = 1;
     
-    public static Integer NUM_VANS = 5;
-    public static Integer NUM_BIC = 1250;
-    private static Integer NUM_EST = 25;
+    public static Integer NUM_VANS = 20;
+    public static Integer NUM_BIC = 5000;
+    private static Integer NUM_EST = 100;
 
     public static final Integer DEMAND = 0;
     public static Bicing bicing = new Bicing(NUM_EST,NUM_BIC, DEMAND, new Random().nextInt());
@@ -78,8 +78,6 @@ public class Simulation {
         BicingHeuristic.heuristicSimple = simpleHeuristic;
 
         Long init, finalization;
-        List<Long> times = new ArrayList();
-        for (int i = 0; i < 50; i++) {
             init = init = System.currentTimeMillis();
             initialState.calculateInitialState();
             printState(initialState);
@@ -87,19 +85,9 @@ public class Simulation {
             printState(Simulation.finalState);
             System.out.println("NUM SUCCESSORS GENERATS TOTAL: " + Simulation.numSuc);
             finalization = System.currentTimeMillis();
-            times.add(finalization - init);
-            NUM_VANS += 5;
-            NUM_EST += 25;
-            NUM_BIC += 1250;
-        }
         
-        NUM_VANS = 5;
-        NUM_EST = 25;
-        NUM_BIC = 1250;
-        
-        for (int i = 0; i < times.size(); ++i) {
-            System.out.println("Furgonetes: " + NUM_VANS + ", Estacions: " + NUM_EST + ", Bicicletes: " + NUM_BIC + times.get(i));
-        }
+            Long result = finalization - init;
+            System.out.println("Furgonetes: " + NUM_VANS + ", Estacions: " + NUM_EST + ", Bicicletes: " + NUM_BIC + " temps: " + result);
 
     }
     
