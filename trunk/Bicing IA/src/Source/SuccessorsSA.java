@@ -28,7 +28,7 @@ public class SuccessorsSA implements SuccessorFunction {
     private List addRandomMovement(BicingState state) {   
         ArrayList successors = new ArrayList();
         BicingState newState = new BicingState(state.getMovements().size(), state.getMovements(), state.getAllBicyclesNextHour());
-        newState.AddRandomMovement(true);
+        newState.addRandomMovement(true);
         successors.add(new Successor("Added Random movement", newState));
         return successors;
     }
@@ -36,7 +36,7 @@ public class SuccessorsSA implements SuccessorFunction {
     private List erasedMovement(BicingState state) {
         ArrayList successors = new ArrayList();
         BicingState newState = new BicingState(state.getMovements().size(), state.getMovements(), state.getAllBicyclesNextHour());
-        newState.EraseRandomMovement();
+        newState.eraseRandomMovement();
         successors.add(new Successor("Erased random movement", newState));     
         return successors;
     }

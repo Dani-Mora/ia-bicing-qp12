@@ -93,4 +93,8 @@ public class Transport {
         }
         return result;
     }
+    
+    public Boolean worthyTransport() {
+        return this.calculateCost() > this.getBicyclesAmount();
+    }
 }
