@@ -23,12 +23,15 @@ public class Simulation {
 
     public static Integer numSuc = 0;
 
-    public static final Integer NUM_VANS = 5;
-    public static final Integer NUM_BIC = 1250;
-    private static final Integer NUM_EST = 25;
+    public static final Integer simpleHeuristic = 1;
+    public static final Integer simpleInitialState = 0;
+    
+    public static Integer NUM_VANS = 5;
+    public static Integer NUM_BIC = 1250;
+    private static Integer NUM_EST = 25;
 
     public static final Integer DEMAND = 0;
-    public static Bicing bicing = new Bicing(NUM_EST,NUM_BIC, DEMAND, 250);
+    public static Bicing bicing = new Bicing(NUM_EST,NUM_BIC, DEMAND, new Random().nextInt());
     public static BicingState finalState = new BicingState();
     
     /* Print functions */
@@ -41,7 +44,7 @@ public class Simulation {
     
     private static void printState(BicingState state) {
         ArrayList<Transport> movements = (ArrayList<Transport>) state.getMovements();
-        System.out.println("*****printState*****");
+        /*System.out.println("*****printState*****");
         System.out.println("Number of selected movements:" + movements.size());
         System.out.println("MOVEMENT DESCRIPTION LIST");
         for (int i = 0; i < movements.size(); ++i) {
@@ -61,28 +64,43 @@ public class Simulation {
             printInfo(i);
             System.out.println("Previsió estació : " + i + " " + aux[i]);
         }
-        
+        */
         BicingHeuristic heuristic = new BicingHeuristic();
-        System.out.println(" ****************************************** dsfsfaf");
-        System.out.println("HEURISTIC ESTAT: " + heuristic.getSimpleHeuristic(state));
+        //System.out.println(" ****************************************** dsfsfaf");
+        Double aux2 = heuristic.getHeuristicValue(state);
+        System.out.println("HEURISTIC ESTAT: " + aux2);
         
     }
     
     public static void main(String[] args){
         BicingState initialState = new BicingState();
-        System.out.println("****************SIMPLE******************");
-        initialState.calculateInitialState();
-        printState(initialState);
-        //System.out.println("****************COMPLEX******************");
-        //initialState.setInitialState(0);
-        //initialState.calculateInitialState(bicing, NUM_BIC);
-        //printState(initialState, bicing);
-           
-        ExecuteHillClimbing(initialState);
-        System.out.println("NUM SUCCESSORS GENERATS TOTAL: " + Simulation.numSuc);
-        printState(Simulation.finalState);
-        //printState(initialState);
-        //ExecuteSimulatedAnnealing(bicing, initialState);
+        BicingState.initialStateSimple = simpleInitialState;
+        BicingHeuristic.heuristicSimple = simpleHeuristic;
+
+        Long init, finalization;
+        List<Long> times = new ArrayList();
+        for (int i = 0; i < 100; i++) {
+            init = init = System.currentTimeMillis();
+            initialState.calculateInitialState();
+            printState(initialState);
+            ExecuteHillClimbing(initialState);
+            printState(Simulation.finalState);
+            System.out.println("NUM SUCCESSORS GENERATS TOTAL: " + Simulation.numSuc);
+            finalization = System.currentTimeMillis();
+            times.add(finalization - init);
+            NUM_VANS += 5;
+            NUM_EST += 25;
+            NUM_BIC += 1250;
+        }
+        
+        NUM_VANS = 5;
+        NUM_EST = 25;
+        NUM_BIC = 1250;
+        
+        for (int i = 0; i < times.size(); ++i) {
+            System.out.println("Furgonetes: " + NUM_VANS + ", Estacions: " + NUM_EST + ", Bicicletes: " + NUM_BIC + times.get(i));
+        }
+
     }
     
     private static void ExecuteHillClimbing(BicingState initSt) {
@@ -93,9 +111,9 @@ public class Simulation {
           
             SearchAgent agent = new SearchAgent(problem,search);
            
-            System.out.println();
-            printActions(agent.getActions());
-            printInstrumentation(agent.getInstrumentation());
+            //System.out.println();
+            //printActions(agent.getActions());
+            //printInstrumentation(agent.getInstrumentation());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -107,6 +125,10 @@ public class Simulation {
             Problem problem = new Problem(initSt, new SuccessorsSA(), new FinalCondition(), new BicingHeuristic());
             Search search =  new SimulatedAnnealingSearch();
             SearchAgent agent = new SearchAgent(problem,search);
+            
+            
+            //printActions(agent.getActions());
+            //printInstrumentation(agent.getInstrumentation());
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -15,13 +15,13 @@ import java.util.List;
  */
 public class BicingHeuristic implements HeuristicFunction {
 
-    private final Integer heuristicUsed = 0;
+    public static Integer heuristicSimple;
     
     @Override
     public double getHeuristicValue(Object o) {
         BicingState st = (BicingState) o;      
         Double heuristic = 0.0;
-        if (heuristicUsed == 0) {
+        if (heuristicSimple == 0) {
             heuristic = this.getComplexHeuristic(st);    
         }
         else {
@@ -92,10 +92,10 @@ public class BicingHeuristic implements HeuristicFunction {
     }
     
     protected Double getComplexHeuristic(BicingState st) {  
-        Double costs = this.getAllTransportCosts(st);
+        /*Double costs = this.getAllTransportCosts(st);
         Double result  = this.getSimpleHeuristicRAW(st) - costs;
-        return (1000000000.0 - result);
-        //return this.getSimpleHeuristic(st) + this.getAllTransportCosts(st);
+        return (10000.0 - result);*/
+        return this.getSimpleHeuristic(st) + this.getAllTransportCosts(st);
     }
     
     public double getSimpleHeuristicRAW(BicingState st) {
@@ -108,15 +108,15 @@ public class BicingHeuristic implements HeuristicFunction {
     
     //pre: there is no station as origin and destination of 2 different transports
     public double getSimpleHeuristic(BicingState st) { 
-        return 1000000000.0 - getSimpleHeuristicRAW(st);
-        /*Double result = 0.0;
+        //return 10000.0 - getSimpleHeuristicRAW(st);
+        Double result = 0.0;
         Integer[] stations = st.getAllBicyclesNextHour();
         for (int i = 0; i < stations.length; ++i) {
             if (stations[i] < Simulation.bicing.getDemandNextHour(i)) {
                 result += Simulation.bicing.getDemandNextHour(i) - stations[i];
             }
         }
-        return result;*/
+        return result;
     }
     
 }
