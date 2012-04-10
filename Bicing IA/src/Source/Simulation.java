@@ -22,7 +22,6 @@ import java.util.Random;
 public class Simulation {
 
     public static Integer numSuc = 0;
-    public static BicingState finalState = new BicingState();
 
     public static final Integer NUM_VANS = 40;
     public static final Integer NUM_BIC = 5000;
@@ -30,6 +29,7 @@ public class Simulation {
 
     public static final Integer DEMAND = 0;
     public static Bicing bicing = new Bicing(NUM_EST,NUM_BIC, DEMAND, new Random().nextInt());
+    public static BicingState finalState = new BicingState();
     
     /* Print functions */
     
