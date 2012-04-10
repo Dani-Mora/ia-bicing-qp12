@@ -132,7 +132,6 @@ public class BicingState {
         int movementCount = 0;
         while (!stationsToSpare.isEmpty() && !stationsInNeed.isEmpty() && movementCount < Simulation.NUM_VANS) {
             Integer indexOrigin = stationsToSpare.get(0), indexDest = -1;
-            System.out.println("indexOrigin|indexDest " + indexOrigin + "|" + indexDest);
             boolean destinationFound = false;
             Integer balanceOrigin = balancedIndex[indexOrigin], bicToTransport, balanceDest, posDEST = 0;
             Integer indexDestMAX = -1, bicToTransportMAX = 0;
@@ -179,7 +178,6 @@ public class BicingState {
             }
             else System.out.println("ERROR: stationsInNeed is Empty - This cannot happen");
             stationsToSpare.remove(0);
-            System.out.println("stationsToSpare size : " + stationsToSpare.size());
         }   
     }
     

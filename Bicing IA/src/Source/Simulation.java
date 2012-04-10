@@ -79,7 +79,7 @@ public class Simulation {
 
         Long init, finalization;
         List<Long> times = new ArrayList();
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 50; i++) {
             init = init = System.currentTimeMillis();
             initialState.calculateInitialState();
             printState(initialState);
