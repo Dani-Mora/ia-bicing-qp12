@@ -22,6 +22,7 @@ import java.util.Random;
 public class Simulation {
 
     public static Integer numSuc = 0;
+    public static BicingState finalState = new BicingState();
 
     public static final Integer NUM_VANS = 40;
     public static final Integer NUM_BIC = 5000;
@@ -79,6 +80,7 @@ public class Simulation {
            
         ExecuteHillClimbing(initialState);
         System.out.println("NUM SUCCESSORS GENERATS TOTAL: " + Simulation.numSuc);
+        printState(Simulation.finalState);
         //printState(initialState);
         //ExecuteSimulatedAnnealing(bicing, initialState);
     }
