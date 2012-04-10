@@ -114,6 +114,7 @@ public class BicingHeuristic implements HeuristicFunction {
         return totalInc;      
     }
     
+    //pre: there is no station as origin and destination of 2 different transports
     public double getSimpleHeuristic(BicingState st) { 
         //return 1.0 / getSimpleHeuristicRAW(st);
         return 1000000000.0 - getSimpleHeuristicRAW(st);
