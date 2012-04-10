@@ -95,6 +95,7 @@ public class BicingHeuristic implements HeuristicFunction {
         Double costs = this.getAllTransportCosts(st);
         Double result  = this.getSimpleHeuristicRAW(st) - costs;
         return (1000000000.0 - result);
+        //return this.getSimpleHeuristic(st) + this.getAllTransportCosts(st);
     }
     
     public double getSimpleHeuristicRAW(BicingState st) {
@@ -108,6 +109,14 @@ public class BicingHeuristic implements HeuristicFunction {
     //pre: there is no station as origin and destination of 2 different transports
     public double getSimpleHeuristic(BicingState st) { 
         return 1000000000.0 - getSimpleHeuristicRAW(st);
+        /*Double result = 0.0;
+        Integer[] stations = st.getAllBicyclesNextHour();
+        for (int i = 0; i < stations.length; ++i) {
+            if (stations[i] < Simulation.bicing.getDemandNextHour(i)) {
+                result += Simulation.bicing.getDemandNextHour(i) - stations[i];
+            }
+        }
+        return result;*/
     }
     
 }
