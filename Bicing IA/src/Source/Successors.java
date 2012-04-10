@@ -20,6 +20,7 @@ public class Successors implements SuccessorFunction {
     @Override
     public List getSuccessors(Object o) {
         BicingState state = (BicingState) o;
+        Simulation.finalState = state;
         ArrayList successors = new ArrayList();   
         if (state.getMovements().size() < Simulation.NUM_VANS) {
          List hola = this.getAllTransports(state, false);
