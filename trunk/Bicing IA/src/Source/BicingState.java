@@ -62,7 +62,7 @@ public class BicingState {
             this.calculateSimpleInitialState();     
         }
     }
-    
+    /*
     private void calculateComplexInitialState() {
         Integer balancedIndex[] = new Integer[Simulation.bicing.getNumStations()];
         ArrayList<Integer> stationsInNeed = new ArrayList<Integer>(), stationsToSpare = new ArrayList<Integer>();
@@ -107,6 +107,79 @@ public class BicingState {
                 stationsToSpare.remove(0); //la estacion de origen es inmediatamente eliminada de la lista
             }
             else System.out.println("ERROR: stationsInNeed is Empty - This cannot happen");
+        }   
+    } */
+    
+    
+    private void calculateComplexInitialState() {
+        Integer balancedIndex[] = new Integer[Simulation.bicing.getNumStations()];
+        ArrayList<Integer> stationsInNeed = new ArrayList<Integer>(), stationsToSpare = new ArrayList<Integer>();
+        
+        // Diferenciem d'estacions que necessiten bicis i estacions que li sobren
+        for (int i = 0; i < Simulation.bicing.getNumStations(); ++i) {                      
+            Integer bicycleSurplus = calculateBicycleSurplus(i);
+            balancedIndex[i] = bicycleSurplus;
+            if (bicycleSurplus > 0) stationsToSpare.add(i);
+            else if (bicycleSurplus < 0) stationsInNeed.add(i);
+        }
+        
+        // anem fent moviments de bicis de les toSpare a les InNeed.
+        // Eliminem de la llista toSpare les que ja siguin origen (restricció) i si el festi
+        // ja te suficients bicis la descartem de la InNeed
+        // Anem assignant de la primera
+        // Condició final: s'acabi alguna de les llistes i/o ja tinguem F moviments
+        
+        int movementCount = 0;
+        while (!stationsToSpare.isEmpty() && !stationsInNeed.isEmpty() && movementCount < Simulation.NUM_VANS) {
+            Integer indexOrigin = stationsToSpare.get(0), indexDest = -1;
+            System.out.println("indexOrigin|indexDest " + indexOrigin + "|" + indexDest);
+            boolean destinationFound = false;
+            Integer balanceOrigin = balancedIndex[indexOrigin], bicToTransport, balanceDest, posDEST = 0;
+            Integer indexDestMAX = -1, bicToTransportMAX = 0;
+            for (int i = 0; i < stationsInNeed.size(); ++i) {
+                indexDest = stationsInNeed.get(i);
+
+                balanceDest = balancedIndex[indexDest];
+                bicToTransport = Math.min(balanceOrigin, Math.abs(balanceDest));
+                bicToTransport = Math.min(bicToTransport, 30);
+                System.out.println("FOR: i|indexDest|balanceDest|bicToTransport|indexDestMax" + i + "|" + indexDest + "|" + balanceDest + "|" + bicToTransport + "|" + indexDestMAX);
+                if (bicToTransport > bicToTransportMAX) {
+                    bicToTransportMAX = bicToTransport;
+                    indexDestMAX = indexDest;
+                    posDEST = i;
+                    destinationFound = true;
+                }
+            }
+            if (destinationFound) {
+                System.out.println("destinationFound");
+                balanceDest = balancedIndex[indexDestMAX];
+                bicToTransport = Math.min(balanceOrigin, Math.abs(balanceDest));
+                bicToTransport = Math.min(bicToTransport, 30);
+
+                balancedIndex[indexOrigin] -= bicToTransport;
+                balancedIndex[indexDestMAX] += bicToTransport;
+
+                Transport t = new Transport(indexOrigin, indexDestMAX, bicToTransport);
+                this.addMovement(t);
+                ++movementCount;
+
+                if (balancedIndex[indexDestMAX] >= 0) {
+                    System.out.println("esborrem, posdest: " + posDEST);
+                    //stationsInNeed.remove(posDEST);
+                    boolean b = false;
+                    for (int i = 0; i < stationsInNeed.size() && !b; ++i) {
+                        if (stationsInNeed.get(i).equals(indexDestMAX)) {
+                            stationsInNeed.remove(i);
+                            b = true;
+                        }
+                    }
+                    System.out.println("stationsToSpare size : " + stationsToSpare.size());
+                }
+                //else break;
+            }
+            else System.out.println("ERROR: stationsInNeed is Empty - This cannot happen");
+            stationsToSpare.remove(0);
+            System.out.println("stationsToSpare size : " + stationsToSpare.size());
         }   
     }
     
