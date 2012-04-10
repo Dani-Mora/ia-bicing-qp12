@@ -47,7 +47,7 @@ public class Successors implements SuccessorFunction {
         successors.addAll(hola2);
         
         
-        System.out.println("Generació de successors"); 
+        //System.out.println("Generació de successors"); 
         Simulation.numSuc += successors.size();
         return successors;
        
