@@ -92,9 +92,9 @@ public class BicingHeuristic implements HeuristicFunction {
     }
     
     protected Double getComplexHeuristic(BicingState st) {  
-        /*Double costs = this.getAllTransportCosts(st);
-        Double result  = this.getSimpleHeuristicRAW(st) - costs;
-        return (10000.0 - result);*/
+//        Double costs = this.getAllTransportCosts(st);
+//        Double result  = this.getSimpleHeuristicRAW(st) - costs;
+//        return (10000.0 - result);
         return this.getSimpleHeuristic(st) + this.getAllTransportCosts(st);
     }
     
