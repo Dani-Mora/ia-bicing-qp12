@@ -21,11 +21,11 @@ import java.util.Random;
  */
 public class Simulation {
 
+    public static Integer numSuc = 0;
 
-
-    public static final Integer NUM_VANS = 5;
-    public static final Integer NUM_BIC = 1250;
-    private static final Integer NUM_EST = 25;
+    public static final Integer NUM_VANS = 40;
+    public static final Integer NUM_BIC = 5000;
+    private static final Integer NUM_EST = 200;
 
     public static final Integer DEMAND = 0;
     public static Bicing bicing = new Bicing(NUM_EST,NUM_BIC, DEMAND, new Random().nextInt());
@@ -78,6 +78,7 @@ public class Simulation {
         //printState(initialState, bicing);
            
         ExecuteHillClimbing(initialState);
+        System.out.println("NUM SUCCESSORS GENERATS TOTAL: " + Simulation.numSuc);
         //printState(initialState);
         //ExecuteSimulatedAnnealing(bicing, initialState);
     }

@@ -27,7 +27,6 @@ public class BicingHeuristic implements HeuristicFunction {
         else {
             heuristic = this.getSimpleHeuristic(st);
         }
-        //System.out.println("Heuristic: " + heuristic);
         return heuristic;
     }
     
@@ -95,8 +94,6 @@ public class BicingHeuristic implements HeuristicFunction {
     protected Double getComplexHeuristic(BicingState st) {  
         Double costs = this.getAllTransportCosts(st);
         Double result  = this.getSimpleHeuristicRAW(st) - costs;
-        //if (result < 0.0) return 0.0;
-        //System.out.println("COMPLEX HEURISTIC, costs|totalInc = " + costs + "|" + result);
         return (1000000000.0 - result);
     }
     
@@ -104,31 +101,13 @@ public class BicingHeuristic implements HeuristicFunction {
         Double totalInc = 0.0;
         Double originLoses = this.calculateOriginLoses(st);
         Double destinationIncome = this.calculateDestinationIncome(st);
-        totalInc = destinationIncome - originLoses  ; // TODO
-//        for (int i = 0; i < Simulation.bicing.getNumStations(); ++i) {
-//            System.out.println("NEXTHOUR BICYCLES on station " + i + " : " + st.getBicyclesNextHour(i));
-//        }
-        //System.out.println("Original loses|Dest Income|Heuristic: " + originLoses + "|" + destinationIncome + "|" + totalInc);
-        //System.out.println("Destination Income: " + destinationIncome);
-        //System.out.println("Heuristic: " + totalInc);
+        totalInc = destinationIncome - originLoses  ;
         return totalInc;      
     }
     
     //pre: there is no station as origin and destination of 2 different transports
     public double getSimpleHeuristic(BicingState st) { 
-        //return 1.0 / getSimpleHeuristicRAW(st);
         return 1000000000.0 - getSimpleHeuristicRAW(st);
-        /* HEURISTICO SENCILLO
-        Double result = 0.0;
-        Integer estimation[] = st.getAvailableBicyclesNextHour();
-        for (int i = 0; i < estimation.length; ++i) {
-            Integer currentStationDemand = Simulation.bicing.getDemandNextHour(i);
-            if (estimation[i] < currentStationDemand) {
-                result += currentStationDemand - estimation[i];
-            }
-        }       
-        return 1/result; // inversa, porque nos interesa que sea mínimo
-        */     
     }
     
 }

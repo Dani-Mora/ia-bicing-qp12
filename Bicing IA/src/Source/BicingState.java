@@ -19,7 +19,7 @@ public class BicingState {
     private List<Transport> movements;
     private Integer[] estimatedBicyclesNextHour;
     
-    private Integer initialState = 0;
+    private Integer initialState = 1;
 
     public void setInitialState(Integer initialState) {
         this.initialState = initialState;
@@ -64,8 +64,6 @@ public class BicingState {
     }
     
     private void calculateComplexInitialState() {
-        System.out.println("SITUATION ANALYSIS STARTED");
-        
         Integer balancedIndex[] = new Integer[Simulation.bicing.getNumStations()];
         ArrayList<Integer> stationsInNeed = new ArrayList<Integer>(), stationsToSpare = new ArrayList<Integer>();
         
@@ -73,17 +71,8 @@ public class BicingState {
         for (int i = 0; i < Simulation.bicing.getNumStations(); ++i) {                      
             Integer bicycleSurplus = calculateBicycleSurplus(i);
             balancedIndex[i] = bicycleSurplus;
-            if (bicycleSurplus > 0) {
-                System.out.println("BICYCLES WE CAN TAKE: " + bicycleSurplus);
-                stationsToSpare.add(i);
-            }
-            else if (bicycleSurplus < 0) {
-                System.out.println("BICYCLES NEEDED: " + bicycleSurplus);
-                stationsInNeed.add(i);
-            }
-            else {
-                System.out.println("NO BICYCLES AVAILABLE");
-            }
+            if (bicycleSurplus > 0) stationsToSpare.add(i);
+            else if (bicycleSurplus < 0) stationsInNeed.add(i);
         }
         
         // anem fent moviments de bicis de les toSpare a les InNeed.
@@ -116,35 +105,23 @@ public class BicingState {
                 }
                 
                 stationsToSpare.remove(0); //la estacion de origen es inmediatamente eliminada de la lista
-
-                System.out.println("MOVEMENT " + movementCount + " SELECTED ");
-                System.out.println("ORIGIN ST: " + indexOrigin);
-                System.out.println("DEST ST: " + indexDest);
-                System.out.println("BICYCLE AMOUNT: " + bicToTransport);
-                System.out.println("BALANCE BEFORE AND AFTER (OR) " + balanceOrigin + "   " + balancedIndex[indexOrigin]);
-                System.out.println("BALANCE BEFORE AND AFTER (DEST) " + balanceDest + "   " + balancedIndex[indexDest]);
             }
             else System.out.println("ERROR: stationsInNeed is Empty - This cannot happen");
-        }
-        
-        System.out.println("NUMBER OF MOVEMENTS DECIDED: " + movementCount);     
-        
-        System.out.println("SITUATION ANALYSIS FINISHED");
+        }   
     }
     
     // We calculate the max amount of bicycles we could move from station "i"
-    private int calculateBicycleSurplus(Integer station) {
+    public static int calculateBicycleSurplus(Integer station) {
         int doNotMove, nextHour, demand;
         doNotMove = Simulation.bicing.getStationDoNotMove(station);
         nextHour = Simulation.bicing.getStationNextState(station);
         demand = Simulation.bicing.getDemandNextHour(station);
-        System.out.println("Station " + station + " DO NOT MOVE " + doNotMove + " NEXT HOUR " + nextHour + " DEMAND " + demand);
         return Math.min(nextHour - demand, doNotMove);
-    }   
+    }
 
     private void calculateSimpleInitialState() {       
         for (int i = 0; i < Simulation.NUM_VANS; ++i) {
-            this.AddRandomMovement(Boolean.FALSE);
+            this.addRandomMovement(Boolean.FALSE);
         }
     }
 
@@ -201,36 +178,23 @@ public class BicingState {
         this.movements.set(indexMovement, t);
     }
     
-    // problema: pot decidir agafar 0 bicis
-    // TODO improve
-    // intelligentOrigin: agafa bicis només d'on sobrin i fa numStations intents. Sinó, agafa una qualssevol
-    public void AddRandomMovement(Boolean intelligentOrigin) {
+    public void addRandomMovement(Boolean intelligentOrigin) {
         Random rand = new Random();
-        Integer origin, dest, amount, numStations = Simulation.bicing.getNumStations();
+        List<Integer> origins = this.getStationsToSpare();
         
-        Integer counter = 0;
-        origin = rand.nextInt(numStations);
-        Boolean improvement = this.getBicyclesNextHour(origin) < Simulation.bicing.getDemandNextHour(origin);
-        while (!this.stationAlreadyOrigin(origin) && Simulation.bicing.getStationDoNotMove(origin) == 0 && (!intelligentOrigin || intelligentOrigin && improvement)) {
-            origin = rand.nextInt(numStations);
-            improvement = this.getBicyclesNextHour(origin) < Simulation.bicing.getDemandNextHour(origin);
-            if (++counter >= numStations) break;
+        if (!origins.isEmpty()) {
+            Integer origin = origins.get(rand.nextInt(origins.size())); // random origin
+            List<Integer> stationsInNeed = this.getStationsinNeed(); 
+            if (!stationsInNeed.isEmpty()) {
+                Integer dest = rand.nextInt(stationsInNeed.size()); // random dest
+                Integer amount = rand.nextInt(Simulation.bicing.getStationDoNotMove(origin));
+                amount = Math.min(30, amount);
+                this.addMovement(new Transport(origin, dest, amount));
+            }
         }
-        
-        if (counter >= numStations) {
-            origin = rand.nextInt(numStations);
-        }
-        
-        dest = rand.nextInt(numStations);
-        amount = Math.min(30,rand.nextInt(Simulation.bicing.getStationDoNotMove(origin)));
-        while (dest == origin) {
-            dest = rand.nextInt(numStations);
-            amount = Math.min(30,rand.nextInt(Simulation.bicing.getStationDoNotMove(origin)));
-        }
-        this.addMovement(new Transport(origin, dest, amount));
     }
     
-    public void EraseRandomMovement() {
+    public void eraseRandomMovement() {
         List<Transport> transports = this.getMovements();     
         if (transports.size() > 0) {
             Collections.shuffle(transports);
@@ -307,13 +271,41 @@ public class BicingState {
         this.movements.set(indexB, tB); // caldria fer aixo?
     }
     
-    // TODO arreglar
-    public void editBicycleAmount(Integer index, Integer newAmount) {
-        Transport t = this.movements.get(index);
-        t.setBicyclesAmount(newAmount);
-        this.movements.set(index, t);
+    // AUX FUNCTIONS //
+    
+    public static List getInitialStationsToSpare() {
+        List<Integer> result = new ArrayList<Integer>();
+        for (int i = 0; i < Simulation.bicing.getNumStations(); ++i) {
+            int balance = BicingState.calculateBicycleSurplus(i);
+            if (balance > 0) result.add(i);
+        }
+        return result;
     }
     
-    // ** TODO **/
-
+    public static List getInitialStationsInNeed() {
+        List<Integer> result = new ArrayList<Integer>();
+        for (int i = 0; i < Simulation.bicing.getNumStations(); ++i) {
+            int balance = BicingState.calculateBicycleSurplus(i);
+            if (balance < 0) result.add(i);
+        }
+        return result;
+    }
+    
+    public List getStationsinNeed() {
+        List<Integer> result = new ArrayList<Integer>();
+        for (int i = 0; i < Simulation.bicing.getNumStations(); ++i) {
+            int balance = this.getBicyclesNextHour(i) - Simulation.bicing.getDemandNextHour(i);
+            if (balance < 0) result.add(i);
+        }
+        return result;
+    }
+    
+    public List getStationsToSpare() {
+        List<Integer> result = new ArrayList<Integer>();
+        for (int i = 0; i < Simulation.bicing.getNumStations(); ++i) {
+            int balance = this.getBicyclesNextHour(i) - Simulation.bicing.getDemandNextHour(i);
+            if (balance > 0 && !this.stationAlreadyOrigin(i) && Simulation.bicing.getStationDoNotMove(i) > 0) result.add(i);
+        }
+        return result;
+    }   
 }
