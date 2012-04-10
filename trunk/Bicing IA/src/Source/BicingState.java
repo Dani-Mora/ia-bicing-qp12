@@ -19,7 +19,7 @@ public class BicingState {
     private List<Transport> movements;
     private Integer[] estimatedBicyclesNextHour;
     
-    private Integer initialState = 1;
+    private Integer initialState = 0;
 
     public void setInitialState(Integer initialState) {
         this.initialState = initialState;
