@@ -379,7 +379,7 @@ public class Successors implements SuccessorFunction {
             BicingState newState = new BicingState(state.getMovements().size(), state.getMovements(), state.getAllBicyclesNextHour());   
             newState.eraseMovement(i);
             double d = bicingHF.getHeuristicValue(newState);
-            System.out.println("Successors newState heuristic = " + d);
+            //System.out.println("Successors newState heuristic = " + d);
             successors.add(new Successor("Erased movement " + i, newState));  
         }
         
