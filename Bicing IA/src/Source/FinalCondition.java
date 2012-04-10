@@ -17,6 +17,8 @@ public class FinalCondition implements GoalTest {
         // Condició en què trobem una solució que ens va bé
         // De moment, fem que no en trobi cap fins que gasti tots les furgonetes
         // més endavant, poder seria convenient veure si podem acabar
+        BicingState state = (BicingState) o;
+        Simulation.finalState = state;
         return false;
     }
     
