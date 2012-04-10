@@ -30,7 +30,7 @@ public class Successors implements SuccessorFunction {
         //List hola1 = this.EraseTransports(state);
         List hola2 = this.UnifyTransports(state);
         List hola3 = this.getDestinationAndAmountChanges(state);
-       //List hola4 = this.getOriginChanges(state);
+//        List hola4 = this.getOriginChanges(state);
         List hola5 = this.getExtraDestinations(state, false);
         
 //        System.out.println("Tamany d'eliminar transports: " + hola1.size());
@@ -40,9 +40,9 @@ public class Successors implements SuccessorFunction {
 //        System.out.println("Tamany de AFEGIR DESTINACIO: " + hola5.size());
         
         successors.addAll(hola5);
-        successors.addAll(hola3);
-       //successors.addAll(hola4);
-       //successors.addAll(hola1);       
+//        successors.addAll(hola3);
+//       successors.addAll(hola4);
+//       successors.addAll(hola1);       
         successors.addAll(hola2);
         
         
@@ -76,7 +76,7 @@ public class Successors implements SuccessorFunction {
         return successors;   
     }*/
    
-    /*
+    
     public List getExtraDestinations(BicingState state, boolean dock) {             
         ArrayList successors = new ArrayList();            
         List<Integer> stationsInNeed = state.getStationsinNeed();
@@ -108,92 +108,7 @@ public class Successors implements SuccessorFunction {
                 }
         }   
         return successors;
-    }*/
-    
-    private List getExtraDestinations(BicingState state, boolean dock) {
-              
-            ArrayList successors = new ArrayList();     
-            Integer numStations = Simulation.bicing.getNumStations(); 
-            BicingHeuristic bicingHF = new BicingHeuristic();       
-            ArrayList<Integer> stationsInNeed = new ArrayList<Integer>();
-            for (int i = 0; i < numStations; ++i) {
-                int balance = BicingState.calculateBicycleSurplus(i);
-                if (balance < 0) stationsInNeed.add(i);
-            }
-            if (!dock) { //few less movements if dock is enabled
-                for (int i = 0; i < state.getMovements().size(); ++i) {
-                    int indexDest = state.getMovements().get(i).getPreferredDestination();
-                    int indexD2 = -1;
-                    if (state.getMovements().get(i).HasTwoDestinations()) indexD2 = state.getMovements().get(i).getSecondDestination();
-                    boolean found = false;
-                    for (int j = 0; j < stationsInNeed.size() && !found; ++j) {
-                        if (stationsInNeed.get(j).equals(indexDest) || stationsInNeed.get(j).equals(indexD2)) {
-                            stationsInNeed.remove(j);
-                            found = true;
-                        }
-                    }
-                }
-            }
-            for (int i = 0; i < state.getMovements().size(); ++i) {
-                Integer movementOrigin = state.getMovements().get(i).getOrigin();
-                
-                int movementDestSecond = -1, amountToFirst = state.getMovements().get(i).getBicyclesAmount();
-                Integer movementFirstDest = state.getMovements().get(i).getPreferredDestination();
-                if (state.getMovements().get(i).HasTwoDestinations()) movementDestSecond = state.getMovements().get(i).getSecondDestination();
-                for (int j = 0; movementDestSecond == -1 && j < stationsInNeed.size(); ++j) {
-                    //int movementDest = state.getMovements().get(i).getPreferredDestination();
-                    //esta linea no tiene sentido. La estacion de destino es la stationsInNeed[j]
-                   
-                    Integer movementNewSecondDest = stationsInNeed.get(j);               
-                    if (!movementNewSecondDest.equals(movementOrigin) && !movementFirstDest.equals(movementNewSecondDest)) {
-                        //origin != dest and the current movement does not have multiple destinations so far
-                        
-                        int newAmount;
-                        if (dock) {
-                            //no provem amb totes les amounts
-                            newAmount = calculateBicycleAmount(movementOrigin, movementNewSecondDest); 
-                            newAmount -= amountToFirst;
-                            newAmount = Math.min(newAmount, 30);
-                            if (newAmount > 0) {
-                               // System.out.println("getExtraDestination I, J, movOrigin, movDestFIRST, movDestSECOND, amountFIRST, amountSECOND "
-                                //    + i + " " + j + " " + movementOrigin+ " "+ movementFirstDest+ " "  + movementNewSecondDest+ " " + amountToFirst + " " + newAmount);
-                                BicingState newState = new BicingState(state.getMovements().size(), state.getMovements(), state.getAllBicyclesNextHour());
-                                newState.eraseMovement(state.getMovements().get(i));
-                                newState.addMovement(new Transport(movementOrigin, movementFirstDest, movementNewSecondDest, amountToFirst + newAmount, newAmount));
-                                //double d = bicingHF.getHeuristicValue(newState);
-                                //System.out.println("Successors newState heuristic = " + d);
-
-                                successors.add(new Successor("ADD destination, origin" + movementOrigin 
-                                        + " goes ALSO to-> " + movementNewSecondDest + "amountMAX ", newState));
-                            }
-                        }
-                        else {
-                            //provem totes les possibilitats
-                            int maxAmount = Simulation.bicing.getStationDoNotMove(movementOrigin);
-                            for (int bicyclesToShare = 1; bicyclesToShare <= maxAmount; ++bicyclesToShare) {
-                                for (int k = 0; k < bicyclesToShare-1; ++k) {
-                                    int amountFirst = k+1, amountSecond = bicyclesToShare - (k+1);
-
-                                    //System.out.println("getExtraDestination I, J, movOrigin, movDestFIRST, movDestSECOND, amountFIRST, amountSECOND "
-                                    //    + i + " " + j + " " + movementOrigin+ " "+ movementFirstDest+ " "  + movementNewSecondDest+ " " + amountFirst + " " + amountSecond);
-                                    BicingState newState = new BicingState(state.getMovements().size(), state.getMovements(), state.getAllBicyclesNextHour());
-                                    newState.eraseMovement(state.getMovements().get(i));
-                                    newState.addMovement(new Transport(movementOrigin, movementFirstDest, movementNewSecondDest, amountFirst + amountSecond, amountSecond));
-                                   // double d = bicingHF.getHeuristicValue(newState);
-                                   // System.out.println("Successors newState heuristic = " + d);
-
-                                    successors.add(new Successor("ADD destination, origin" + movementOrigin 
-                                            + " goes ALSO to-> " + movementNewSecondDest + "amountFIRST|SECOND " + amountFirst + "|" + amountSecond, newState));                                
-                                }     
-                            }
-                        }
-                        
-
-                    }
-                }
-            }   
-            return successors;
-        }
+    }
     
     public List getDestinationAndAmountChanges(BicingState state) {   
         ArrayList successors = new ArrayList();          

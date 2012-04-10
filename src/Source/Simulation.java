@@ -23,12 +23,12 @@ public class Simulation {
 
     public static Integer numSuc = 0;
 
-    public static final Integer simpleHeuristic = 0;
-    public static final Integer simpleInitialState = 1;
+    public static final Integer simpleHeuristic = 1;
+    public static final Integer simpleInitialState = 0;
     
-    public static Integer NUM_VANS = 20;
-    public static Integer NUM_BIC = 5000;
-    private static Integer NUM_EST = 100;
+    public static Integer NUM_VANS = 5;
+    public static Integer NUM_BIC = 1250;
+    private static Integer NUM_EST = 25;
 
     public static final Integer DEMAND = 0;
     public static Bicing bicing = new Bicing(NUM_EST,NUM_BIC, DEMAND, new Random().nextInt());
@@ -100,8 +100,8 @@ public class Simulation {
             SearchAgent agent = new SearchAgent(problem,search);
            
             //System.out.println();
-            //printActions(agent.getActions());
-            //printInstrumentation(agent.getInstrumentation());
+            printActions(agent.getActions());
+            printInstrumentation(agent.getInstrumentation());
         } catch (Exception e) {
             e.printStackTrace();
         }
